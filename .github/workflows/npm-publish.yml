@@ -43,6 +43,6 @@ jobs:
           corepack enable
           yarn install --immutable
       - name: Publish to npm
-        run: yarn npm publish --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

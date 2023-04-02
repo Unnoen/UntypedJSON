@@ -30,7 +30,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build --verbose --pretty",
     "test": "jest",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
