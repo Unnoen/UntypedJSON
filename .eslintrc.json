@@ -1,0 +1,55 @@
+{
+  "extends": ["canonical"],
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "rules": {
+    "indent": ["error", 4],
+    "linebreak-style": ["off"],
+    "canonical/filename-match-exported": "off",
+    "canonical/filename-match-regex": "off" ,
+    "complexity": "off",
+    "valid-typeof": "off",
+    "array-bracket-newline": ["error", "consistent"],
+    "no-prototype-builtins": "off"
+  },
+  "overrides": [
+    {
+      "extends": [
+        "canonical/jsdoc",
+        "canonical/regexp",
+        "canonical/typescript"
+      ],
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/indent": ["error", 4],
+        "@typescript-eslint/no-use-before-define": "off",
+        "jsdoc/require-param-type": ["error"]
+      }
+    },
+    {
+      "extends": [
+        "canonical/typescript",
+        "canonical/jest"
+      ],
+      "files": ["*.test.ts"],
+      "parserOptions": {
+        "project": "./test/tsconfig.json"
+      },
+      "rules": {
+        "import/no-unassigned-import": "off",
+        "jest/expect-expect": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/indent": ["error", 4]
+      }
+    }
+  ],
+  "ignorePatterns": ["lib", "node_modules"],
+  "root": true
+}
