@@ -1,6 +1,7 @@
 # UntypedJSON
 ##### Typed JSON. The name is a lie.
-
+[![npm](https://img.shields.io/npm/v/@unnoen/untypedjson?logo=npm)](https://www.npmjs.com/package/@unnoen/untypedjson)
+[![workflow](https://github.com/unnoen/untypedjson/actions/workflows/pull-request.yml/badge.svg?event=push&branch=main)](https://github.com/Unnoen/UntypedJSON)
 ---
 A simple JSON deserializer and serializer for Node.js and the browser using TypeScript decorators.
 
@@ -28,15 +29,15 @@ Just use your favourite package manager:
 
 npm
 
-`npm install untypedjson`
+`npm install @unnoen/untypedjson`
 
 pnpm
 
-`pnpm add untypedjson`
+`pnpm add @unnoen/untypedjson`
 
 Yarn
 
-`yarn add untypedjson`
+`yarn add @unnoen/untypedjson`
 
 ## Usage
 It's super simple to use.
