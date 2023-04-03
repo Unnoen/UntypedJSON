@@ -420,4 +420,15 @@ describe('JsonProperty Nullability Tests', () => {
 
         expect(testJson.test).toBe('test');
     });
+
+    it('should deserialize an array property with a default value if nullability is set to ignore', () => {
+        class TestClass {
+            @JsonProperty('test', [JsonType.STRING], PropertyNullability.IGNORE)
+            public test: string[] = ['test'];
+        }
+
+        const testJson = DeserializeObject({}, TestClass);
+
+        expect(testJson.test).toEqual(['test']);
+    });
 });

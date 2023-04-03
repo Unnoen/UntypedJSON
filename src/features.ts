@@ -52,6 +52,10 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
         type,
     } = properties;
 
+    if (typeof json[jsonProperty] === 'undefined' && nullabilityMode === (PropertyNullability.IGNORE || PropertyNullability.PASS)) {
+        return;
+    }
+
     if (Array.isArray(type)) {
         if (!Array.isArray(json[jsonProperty])) {
             throw new TypeError(`Property ${propertyKey} is not an array. It is a ${typeof json[jsonProperty]}.`);
@@ -95,10 +99,6 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
         return;
     }
 
-    if (typeof json[jsonProperty] === 'undefined' && nullabilityMode === (PropertyNullability.IGNORE || PropertyNullability.PASS)) {
-        return;
-    }
-
     if (type !== typeof json[jsonProperty] && type !== JsonType.ANY) {
         throw new TypeError(`Property ${propertyKey} is not a ${type}. It is a ${typeof json[jsonProperty]}.`);
     }
@@ -139,6 +139,10 @@ const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadat
         toObject[toKey] = serialize ? SerializeObject(fromObject[fromKey]) : DeserializeObject(fromObject[fromKey], classType);
     } else if (array) {
         if (classType === undefined) {
+            if (nullabilityMode === PropertyNullability.IGNORE && (fromObject[fromKey] === null || fromObject[fromKey] === undefined)) {
+                return;
+            }
+
             toObject[toKey] = fromObject[fromKey];
             return;
         }
