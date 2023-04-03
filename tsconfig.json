@@ -10,10 +10,9 @@
     "strict": false,
     "skipLibCheck": true,
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./lib/esm",
-    "lib": ["ES2021", "DOM"]
+    "outDir": "lib",
+    "removeComments": false,
+    "lib": ["ES2021", "DOM"],
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "lib", ".yarn"]

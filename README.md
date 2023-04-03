@@ -8,6 +8,8 @@ It supports nested classes, arrays, null/undefined values, has type safety and t
 
 Designed to be lightweight with no dependencies. Your bundler will thank you.
 
+Offers both CommonJS and ES Module builds, so you can use it with Node.js, Webpack, Rollup, Parcel, Vite etc.
+
 - [Installation](#installation)
 - [Usage](#usage)
   - [Simple Types](#simple-types)
