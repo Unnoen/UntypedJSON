@@ -62,7 +62,7 @@ Make sure you have these options enabled in your `tsconfig.json`:
 You have to use the provided `JsonType` enum so that the parser knows how to parse the value.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
   @JsonProperty('name', JsonType.STRING)
@@ -82,7 +82,7 @@ console.log(person.age); // 42
 
 You can also import the `JsonType` constants directly if that's more your style.
 ```ts
-import { DeserializeObject, JsonProperty, STRING } from "untypedjson";
+import { DeserializeObject, JsonProperty, STRING } from "@unnoen/untypedjson";
 
 class Person {
   @JsonProperty('name', STRING)
@@ -96,7 +96,7 @@ Just wrap your type in an array.
 The parser will automatically detect it and parse it as an array.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('aliases', [JsonType.STRING])
@@ -115,7 +115,7 @@ console.log(person.aliases[0]); // John
 Just use the class as the type.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('name', JsonType.STRING)
@@ -145,7 +145,7 @@ console.log(company.employees[0].name); // John Doe
 Just extend the class and use the `@JsonProperty` decorator on the properties you want to override.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('name', JsonType.STRING)
@@ -176,7 +176,7 @@ If you want to allow null or undefined values, just use the `PropertyNullability
 - `PropertyNullability.PASS` will pass the value as is.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('name', JsonType.STRING)
@@ -200,7 +200,7 @@ If you want to set a default value, just set it in the initializer.
 Make sure to set the `PropertyNullability` to `PropertyNullability.IGNORE` so that the parser doesn't override it!
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "untypedjson";
+import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('name', JsonType.STRING)
@@ -224,7 +224,7 @@ If you want to use a custom deserializer or serializer, just extend the `JsonCon
 Make sure you implement your own type checking!
 
 ```ts
-import { DeserializeObject, JsonConverter, JsonProperty, JsonType } from "untypedjson";
+import { DeserializeObject, JsonConverter, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class DateConverter extends JsonConverter<Date> {
     public Serialize (value: Date): string {
