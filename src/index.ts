@@ -2,6 +2,7 @@ export {
     JsonConverter,
 } from './converters';
 export {
+    JsonMixin,
     JsonProperty,
 } from './decorators';
 export {
@@ -11,6 +12,7 @@ export {
 export {
     ANY,
     BOOLEAN,
+    IJsonClassMetadata,
     IJsonPropertyMetadata,
     JsonType,
     NUMBER,

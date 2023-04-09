@@ -2,7 +2,7 @@
   "packageManager": "yarn@3.5.0",
   "name": "@unnoen/untypedjson",
   "description": "A simple JSON deserializer and serializer for Node.js and the browser using TypeScript decorators.",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "type": "module",
   "license": "MIT",
   "author": "Unnoen",

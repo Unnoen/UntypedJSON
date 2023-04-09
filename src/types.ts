@@ -10,6 +10,11 @@ import {
 export type DeserializeType = Array<JsonConverter<any>> | Array<new() => any> | JsonConverter<any> | JsonType | JsonType[] | (new() => any);
 
 /**
+ * The type of the constructor.
+ */
+export type Constructor<T = {}> = new (...args: any[]) => T;
+
+/**
  * The metadata for a JSON property.
  *
  * @property {PropertyNullability} nullabilityMode - The nullability mode of the property.
@@ -26,6 +31,18 @@ export type IJsonPropertyMetadata = {
     nested: boolean,
     nullabilityMode: PropertyNullability,
     type?: DeserializeType,
+};
+
+/**
+ * The metadata for a JSON class.
+ * This is used to store the properties and mixins of a class.
+ *
+ * @property {Array<new() => any>} mixins - The mixins of the class.
+ * @property {Map<string, IJsonPropertyMetadata>} properties - The properties of the class.
+ */
+export type IJsonClassMetadata = {
+    mixins: Array<new() => any>,
+    properties: Map<string, IJsonPropertyMetadata>,
 };
 
 /**

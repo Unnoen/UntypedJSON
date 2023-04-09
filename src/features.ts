@@ -1,4 +1,5 @@
 import {
+    type IJsonClassMetadata,
     type IJsonPropertyMetadata,
     JsonType,
     PropertyNullability,
@@ -179,16 +180,32 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
     let classConstructor = classReference;
 
     while (classConstructor !== null && classConstructor?.prototype !== Object.prototype) {
-        const propertiesMetadata = classConstructor.hasOwnProperty(metadataKey) ?
+        const classMetadata: IJsonClassMetadata = classConstructor.hasOwnProperty(metadataKey) ?
             classConstructor[metadataKey] :
-            Object.create(null);
+            Object.create({
+                mixins: [],
+                properties: Object.create(null),
+            });
 
-        const propertyKeys = Object.keys(propertiesMetadata);
+        for (const mixin of classMetadata.mixins) {
+            const mixinObject = DeserializeObject(jsonObject, mixin);
+            Object.assign(instance, mixinObject);
+
+            const mixinKeys = Object.getOwnPropertyNames(mixin.prototype);
+            for (const mixinKey of mixinKeys) {
+                const descriptor = Object.getOwnPropertyDescriptor(mixin.prototype, mixinKey);
+                if (descriptor !== undefined && mixinKey !== 'constructor') {
+                    Object.defineProperty(instance, mixinKey, descriptor);
+                }
+            }
+        }
+
+        const propertyKeys = Object.keys(classMetadata?.properties);
 
         for (const propertyKey of propertyKeys) {
-            verifyNullability(propertyKey, propertiesMetadata[propertyKey], jsonObject);
-            verifyType(propertyKey, propertiesMetadata[propertyKey], jsonObject);
-            mapObjectProperty(propertyKey, propertiesMetadata[propertyKey], jsonObject, instance);
+            verifyNullability(propertyKey, classMetadata.properties[propertyKey], jsonObject);
+            verifyType(propertyKey, classMetadata.properties[propertyKey], jsonObject);
+            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance);
         }
 
         classConstructor = Object.getPrototypeOf(classConstructor);
@@ -210,14 +227,17 @@ export const SerializeObject = <T>(instance: T): object => {
     let classConstructor = instance.constructor;
 
     while (classConstructor !== null && classConstructor?.prototype !== Object.prototype) {
-        const propertiesMetadata = classConstructor.hasOwnProperty(metadataKey) ?
+        const classMetadata: IJsonClassMetadata = classConstructor.hasOwnProperty(metadataKey) ?
             classConstructor[metadataKey] :
-            Object.create(null);
+            Object.create({
+                mixins: [],
+                properties: Object.create(null),
+            });
 
-        const propertyKeys = Object.keys(propertiesMetadata);
+        const propertyKeys = Object.keys(classMetadata?.properties);
 
         for (const propertyKey of propertyKeys) {
-            mapObjectProperty(propertyKey, propertiesMetadata[propertyKey], instance, json, true);
+            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], instance, json, true);
         }
 
         classConstructor = Object.getPrototypeOf(classConstructor);

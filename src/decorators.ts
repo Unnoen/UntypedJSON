@@ -2,7 +2,9 @@ import {
     metadataKey,
 } from './features';
 import {
+    type Constructor,
     type DeserializeType,
+    type IJsonClassMetadata,
     type IJsonPropertyMetadata,
     PropertyNullability,
 } from './types';
@@ -18,7 +20,7 @@ import {
  *    \@JsonProperty('test', JsonType.STRING)
  *    public test: string;
  *
- *   \@JsonProperty('testArray', [JsonType.STRING])
+ *    \@JsonProperty('testArray', [JsonType.STRING])
  *    public testArray: string[] = [];
  * }
  */
@@ -37,10 +39,45 @@ export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullab
         };
 
         const targetConstructor = target.constructor;
-        const propertiesMetadata = targetConstructor.hasOwnProperty(metadataKey) ?
-            targetConstructor[metadataKey] :
-            Object.create(null);
+        const classMetadata: IJsonClassMetadata = targetConstructor.hasOwnProperty(metadataKey) ? targetConstructor[metadataKey] : Object.create({
+            mixins: [],
+            properties: Object.create(null),
+        });
+        const propertiesMetadata = classMetadata?.hasOwnProperty('properties') ? classMetadata.properties : Object.create(null);
+
         propertiesMetadata[propertyKey] = metadata;
-        targetConstructor[metadataKey] = propertiesMetadata;
+
+        targetConstructor[metadataKey] = {
+            mixins: [],
+            properties: propertiesMetadata,
+        } as IJsonClassMetadata;
+    };
+};
+
+/**
+ * Decorator for classes that should inherit (mix in) other classes.
+ *
+ * @template T
+ * @param {T} classes The classes to mix in.
+ * @example
+ * class Walkable {...}
+ * class Flyable {...}
+ *
+ * \@JsonMixin(Walkable, Flyable)
+ * class Bird {
+ *    \@JsonProperty('name', JsonType.STRING)
+ *    public name: string;
+ * }
+ */
+export const JsonMixin = <T extends Constructor[]> (...classes: T) => {
+    return function <C extends Constructor>(target: C): void {
+        const classMetadata: IJsonClassMetadata = target.hasOwnProperty(metadataKey) ? target[metadataKey] : Object.create({
+            mixins: [],
+            properties: Object.create(null),
+        });
+
+        classMetadata.mixins = classes;
+
+        target[metadataKey] = classMetadata;
     };
 };

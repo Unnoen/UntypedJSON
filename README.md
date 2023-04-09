@@ -7,6 +7,8 @@ A simple JSON deserializer and serializer for Node.js and the browser using Type
 
 It supports nested classes, arrays, null/undefined values, has type safety and the ability to create custom deserializers and serializers.
 
+It also has support for Mixins, so you can extend (multiple!) classes and override properties.
+
 Designed to be lightweight with no dependencies. Your bundler will thank you.
 
 Offers both CommonJS and ES Module builds, so you can use it with Node.js, Webpack, Rollup, Parcel, Vite etc.
@@ -20,6 +22,7 @@ Offers both CommonJS and ES Module builds, so you can use it with Node.js, Webpa
   - [Null & Undefined Values](#null--undefined-values)
   - [Default Values](#default-values)
   - [Custom Deserializers & Serializers](#custom-deserializers--serializers)
+  - [Mixins](#mixins)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
@@ -250,6 +253,41 @@ const person = DeserializeObject(jsonString, Person);
 
 console.log(person.name); // John Doe
 console.log(person.birthday.getFullYear()); // 1990
+```
+
+### Mixins
+Ever wanted to add properties to a class from multiple other classes? Well now you can!
+
+Use `@JsonMixin` to inherit properties from multiple classes. It also inherits the `@JsonProperty` decorators and getters/setters.
+
+Make sure to define the interface for the class you're mixing in!
+
+```ts
+import { DeserializeObject, JsonMixin, JsonProperty, JsonType } from "@unnoen/untypedjson";
+
+interface EmployeePerson extends Person, Employee {} // You must define the interface otherwise the compiler will complain.
+
+class Person {
+    @JsonProperty('name', JsonType.STRING)
+    public name: string;
+}
+
+class Employee {
+    @JsonProperty('salary', JsonType.NUMBER)
+    public salary: number;
+}
+
+@JsonMixin(Person, Employee)
+class EmployeePerson {
+    // This class will have the properties from Person and Employee
+}
+
+const jsonString = '{"name": "John Doe", "salary": 100000}';
+
+const employee = DeserializeObject(jsonString, EmployeePerson);
+
+console.log(employee.name); // John Doe
+console.log(employee.salary); // 100000
 ```
 
 ## Contributing
