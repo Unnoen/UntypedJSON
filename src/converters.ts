@@ -7,7 +7,6 @@ import {
  *
  * When extending this class, you must implement the Serialize and Deserialize methods.
  * Type checking is not performed when using a custom converter.
- *
  * @template T
  * @returns {JsonConverter<T>}
  * @class
@@ -30,7 +29,6 @@ import {
 export abstract class JsonConverter<T> {
     /**
      * Serializes a value into a JSON object.
-     *
      * @param {T} value
      * @returns {any}
      */
@@ -38,7 +36,6 @@ export abstract class JsonConverter<T> {
 
     /**
      * Deserializes a JSON object into a value.
-     *
      * @param value
      * @returns {T}
      */
