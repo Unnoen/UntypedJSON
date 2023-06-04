@@ -11,7 +11,6 @@ import {
 
 /**
  * Decorator for properties that should be serialized and deserialized.
- *
  * @param {string} jsonProperty The name of the property in the JSON.
  * @param {DeserializeType} type The type of the property. Can be a primitive type, a class, an array of either, or a JsonConverter
  * @param {PropertyNullability} nullabilityMode The nullability mode of the property.
@@ -56,7 +55,6 @@ export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullab
 
 /**
  * Decorator for classes that should inherit (mix in) other classes.
- *
  * @template T
  * @param {T} classes The classes to mix in.
  * @example

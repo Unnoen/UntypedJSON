@@ -32,7 +32,6 @@ export abstract class JsonConverter<T> {
      * Serializes a value into a JSON object.
      *
      * @param {T} value
-     * @class
      * @returns {any}
      */
     public abstract Serialize (value: T): any;
@@ -41,7 +40,6 @@ export abstract class JsonConverter<T> {
      * Deserializes a JSON object into a value.
      *
      * @param value
-     * @class
      * @returns {T}
      */
     public abstract Deserialize (value: JsonType): T;

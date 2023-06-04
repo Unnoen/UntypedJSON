@@ -9,10 +9,12 @@ export const metadataKey = Symbol('UntypedJSONMetadata');
 
 /**
  * Verifies that the JSON object has all the required properties.
- *
  * @param {string} propertyKey The property key.
  * @param {IJsonPropertyMetadata} properties The property metadata.
  * @param {object} json The JSON object.
+ * @returns {void}
+ * @throws {ReferenceError} If the property is not defined in the JSON.
+ * @throws {TypeError} If the property is null and nullability mode is MAP.
  */
 const verifyNullability = (propertyKey: string, properties: IJsonPropertyMetadata, json: object): void => {
     const {
@@ -39,7 +41,6 @@ const verifyNullability = (propertyKey: string, properties: IJsonPropertyMetadat
 
 /**
  * Verifies that the type of the property is correct.
- *
  * @param {string} propertyKey The property key.
  * @param {IJsonPropertyMetadata} properties The property metadata.
  * @param {object} json The JSON object.
@@ -107,7 +108,6 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
 
 /**
  * Maps a property from one object to another. This is used for serialization and deserialization.
- *
  * @param {string} propertyKey The property key.
  * @param {IJsonPropertyMetadata} properties The property metadata.
  * @param {any} fromObject The object to map from.
@@ -162,11 +162,12 @@ const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadat
 
 /**
  * Deserializes a JSON object into an instance of a class.
- *
  * @template T
  * @param {object | string} json The JSON object to deserialize. Can be a string or an object.
  * @param {T} classReference The class reference to deserialize the JSON object into.
  * @returns {T} The deserialized instance of the class.
+ * @throws {TypeError} If the JSON object is not an object or string.
+ * @throws {ReferenceError} If the property is not defined in the JSON.
  */
 export const DeserializeObject = <T>(json: object | string, classReference: new() => T): T => {
     const jsonObject: object = typeof json === 'string' ? JSON.parse(json) : json;
@@ -216,7 +217,6 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
 
 /**
  * Serializes an instance of a class into a JSON object.
- *
  * @template T
  * @param {T} instance The instance of the class to serialize.
  * @returns {object} The serialized JSON object.

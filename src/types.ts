@@ -16,7 +16,6 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
 
 /**
  * The metadata for a JSON property.
- *
  * @property {PropertyNullability} nullabilityMode - The nullability mode of the property.
  * @property {boolean} array - Whether the property is an array.
  * @property {Function} classType - The type of the property if it is a class.
@@ -36,7 +35,6 @@ export type IJsonPropertyMetadata = {
 /**
  * The metadata for a JSON class.
  * This is used to store the properties and mixins of a class.
- *
  * @property {Array<new() => any>} mixins - The mixins of the class.
  * @property {Map<string, IJsonPropertyMetadata>} properties - The properties of the class.
  */
@@ -47,7 +45,6 @@ export type IJsonClassMetadata = {
 
 /**
  * The nullability mode of a property.
- *
  * @enum {number}
  * @property {number} MAP - Attempt to map null values.
  * @property {number} IGNORE - Ignore null values.
@@ -61,7 +58,6 @@ export enum PropertyNullability {
 
 /**
  * The type of property that should be serialized. This is for JSON primitives.
- *
  * @enum {string}
  * @property {string} STRING - A string.
  * @property {string} NUMBER - A number.

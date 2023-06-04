@@ -50,6 +50,6 @@
       }
     }
   ],
-  "ignorePatterns": ["lib", "node_modules"],
+  "ignorePatterns": ["lib", "node_modules", "jest.config.js", "rollup.config.js"],
   "root": true
 }
