@@ -35,7 +35,7 @@ const verifyNullability = (propertyKey: string, properties: IJsonPropertyMetadat
     }
 
     if (!json.hasOwnProperty(jsonProperty)) {
-        throw new ReferenceError(`Property ${propertyKey} is not defined in the JSON.`);
+        throw new ReferenceError(`Property ${propertyKey} is not defined in the JSON.\r\n${JSON.stringify(json, null, 4)}`);
     }
 };
 

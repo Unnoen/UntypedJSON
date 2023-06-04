@@ -431,4 +431,15 @@ describe('JsonProperty Nullability Tests', () => {
 
         expect(testJson.test).toEqual(['test']);
     });
+
+    it('should throw an error if the property is not defined in the JSON', () => {
+        class TestClass {
+            @JsonProperty('test', JsonType.STRING)
+            public test: string;
+        }
+
+        expect(() => {
+            DeserializeObject({}, TestClass);
+        }).toThrow('Property test is not defined in the JSON.\r\n{}');
+    });
 });
