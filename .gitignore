@@ -13,7 +13,7 @@
 .pnp.loader.*
 
 # Build files
-lib
+dist
 
 # Dependency directories
 node_modules

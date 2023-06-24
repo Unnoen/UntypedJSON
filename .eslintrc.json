@@ -50,6 +50,6 @@
       }
     }
   ],
-  "ignorePatterns": ["lib", "node_modules", "jest.config.js", "rollup.config.js"],
+  "ignorePatterns": ["dist", "node_modules", "jest.config.js", "vite.config.js"],
   "root": true
 }
