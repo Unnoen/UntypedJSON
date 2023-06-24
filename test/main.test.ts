@@ -44,11 +44,11 @@ describe('JsonType Constants Tests', () => {
 describe('DeserializeObject Tests', () => {
     it('should parse a JSON string', () => {
         class TestClass {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
-        const testJson = DeserializeObject('{"test": "test"}', TestClass);
+        const testJson = DeserializeObject('{"t": "test"}', TestClass);
 
         expect(testJson.test).toBe('test');
     });

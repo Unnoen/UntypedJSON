@@ -5,6 +5,8 @@
 ---
 A simple JSON deserializer and serializer for Node.js and the browser using TypeScript decorators.
 
+Ever been working with JSON that uses inconsistent naming conventions? Then this is the library for you!
+
 It supports nested classes, arrays, null/undefined values, has type safety and the ability to create custom deserializers and serializers.
 
 It also has support for Mixins, so you can extend (multiple!) classes and override properties.
@@ -67,18 +69,21 @@ You have to use the provided `JsonType` enum so that the parser knows how to par
 ```ts
 import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
+
 class Person {
-  @JsonProperty('name', JsonType.STRING)
+  // The JSON uses terrible naming conventions, so we map them to our own ones.
+  @JsonProperty('fn', JsonType.STRING)
   public name: string;
 
-  @JsonProperty('age', JsonType.NUMBER)
+  @JsonProperty('a', JsonType.NUMBER)
   public age: number;
 }
 
-const jsonString = '{"name": "John Doe", "age": 42}';
+const jsonString = '{"fn": "John Doe", "a": 42}';
 
 const person = DeserializeObject(jsonString, Person);
 
+// Now we can use our own property names!
 console.log(person.name); // John Doe
 console.log(person.age); // 42
 ```
@@ -88,7 +93,7 @@ You can also import the `JsonType` constants directly if that's more your style.
 import { DeserializeObject, JsonProperty, STRING } from "@unnoen/untypedjson";
 
 class Person {
-  @JsonProperty('name', STRING)
+  @JsonProperty('fn', STRING)
   public name: string;
 }
 // ...
@@ -102,11 +107,11 @@ The parser will automatically detect it and parse it as an array.
 import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
-    @JsonProperty('aliases', [JsonType.STRING])
+    @JsonProperty('aka', [JsonType.STRING])
     public aliases: string[];
 }
 
-const jsonString = '{"aliases": ["John", "Doe"]}';
+const jsonString = '{"aka": ["John", "Doe"]}';
 
 const person = DeserializeObject(jsonString, Person);
 
@@ -121,22 +126,22 @@ Just use the class as the type.
 import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
 
-    @JsonProperty('age', JsonType.NUMBER)
+    @JsonProperty('a', JsonType.NUMBER)
     public age: number;
 }
 
 class Company {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('cn', JsonType.STRING)
     public name: string;
 
     @JsonProperty('employees', [Person]) // You can also use them in arrays!
     public employees: Person[];
 }
 
-const jsonString = '{"name": "ACME Inc.", "employees": [{"name": "John Doe", "age": 42}]}';
+const jsonString = '{"cn": "ACME Inc.", "employees": [{"fn": "John Doe", "a": 42}]}';
 
 const company = DeserializeObject(jsonString, Company);
 
@@ -151,19 +156,19 @@ Just extend the class and use the `@JsonProperty` decorator on the properties yo
 import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
 
-    @JsonProperty('age', JsonType.NUMBER)
+    @JsonProperty('a', JsonType.NUMBER)
     public age: number;
 }
 
 class Employee extends Person {
-    @JsonProperty('salary', JsonType.NUMBER)
+    @JsonProperty('s', JsonType.NUMBER)
     public salary: number;
 }
 
-const jsonString = '{"name": "John Doe", "age": 42, "salary": 100000}';
+const jsonString = '{"fn": "John Doe", "a": 42, "s": 100000}';
 
 const employee = DeserializeObject(jsonString, Employee);
 
@@ -182,14 +187,14 @@ If you want to allow null or undefined values, just use the `PropertyNullability
 import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
     
-    @JsonProperty('age', JsonType.NUMBER, PropertyNullability.IGNORE)
+    @JsonProperty('a', JsonType.NUMBER, PropertyNullability.IGNORE)
     public age: number;
 }
 
-const jsonString = '{"name": "John Doe"}';
+const jsonString = '{"fn": "John Doe"}';
 
 const person = DeserializeObject(jsonString, Person);
 
@@ -206,14 +211,14 @@ Make sure to set the `PropertyNullability` to `PropertyNullability.IGNORE` so th
 import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
     
-    @JsonProperty('age', JsonType.NUMBER, PropertyNullability.IGNORE)
+    @JsonProperty('a', JsonType.NUMBER, PropertyNullability.IGNORE)
     public age: number = 42;
 }
 
-const jsonString = '{"name": "John Doe"}';
+const jsonString = '{"fn": "John Doe"}';
 
 const person = DeserializeObject(jsonString, Person);
 
@@ -240,14 +245,14 @@ class DateConverter extends JsonConverter<Date> {
 }
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
 
-    @JsonProperty('birthday', DateConverter)
+    @JsonProperty('b', DateConverter)
     public birthday: Date;
 }
 
-const jsonString = '{"name": "John Doe", "birthday": "1990-01-01"}';
+const jsonString = '{"fn": "John Doe", "b": "1990-01-01"}';
 
 const person = DeserializeObject(jsonString, Person);
 
@@ -268,12 +273,12 @@ import { DeserializeObject, JsonMixin, JsonProperty, JsonType } from "@unnoen/un
 interface EmployeePerson extends Person, Employee {} // You must define the interface otherwise the compiler will complain.
 
 class Person {
-    @JsonProperty('name', JsonType.STRING)
+    @JsonProperty('fn', JsonType.STRING)
     public name: string;
 }
 
 class Employee {
-    @JsonProperty('salary', JsonType.NUMBER)
+    @JsonProperty('s', JsonType.NUMBER)
     public salary: number;
 }
 
@@ -282,7 +287,7 @@ class EmployeePerson {
     // This class will have the properties from Person and Employee
 }
 
-const jsonString = '{"name": "John Doe", "salary": 100000}';
+const jsonString = '{"fn": "John Doe", "s": 100000}';
 
 const employee = DeserializeObject(jsonString, EmployeePerson);
 
