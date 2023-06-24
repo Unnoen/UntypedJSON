@@ -1,4 +1,3 @@
-import 'jest';
 import {
     ANY,
     BOOLEAN,
@@ -61,7 +60,6 @@ describe('DeserializeObject Tests', () => {
 
         expect(() => {
             DeserializeObject('{"test": "test"', TestClass);
-            // eslint-disable-next-line jest/require-to-throw-message
         }).toThrow();
     });
 

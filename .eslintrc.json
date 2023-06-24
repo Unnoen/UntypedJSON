@@ -2,8 +2,7 @@
   "extends": ["canonical"],
   "env": {
     "node": true,
-    "es6": true,
-    "jest": true
+    "es6": true
   },
   "rules": {
     "indent": ["error", 4],
@@ -35,8 +34,7 @@
     },
     {
       "extends": [
-        "canonical/typescript",
-        "canonical/jest"
+        "canonical/typescript"
       ],
       "files": ["*.test.ts"],
       "parserOptions": {
@@ -44,12 +42,11 @@
       },
       "rules": {
         "import/no-unassigned-import": "off",
-        "jest/expect-expect": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/indent": ["error", 4]
       }
     }
   ],
-  "ignorePatterns": ["dist", "node_modules", "jest.config.js", "vite.config.js"],
+  "ignorePatterns": ["dist", "node_modules", "vite.config.js"],
   "root": true
 }
