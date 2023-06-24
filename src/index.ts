@@ -12,8 +12,8 @@ export {
 export {
     ANY,
     BOOLEAN,
-    IJsonClassMetadata,
-    IJsonPropertyMetadata,
+    type IJsonClassMetadata,
+    type IJsonPropertyMetadata,
     JsonType,
     NUMBER,
     OBJECT,

@@ -73,9 +73,7 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
         }
 
         for (const item of json[jsonProperty]) {
-            if (typeof item !== arrayType && typeof arrayType !== 'function') {
-                throw new TypeError(`Property ${propertyKey} is not an array of ${arrayType}. It is an array of ${typeof item}.`);
-            } else if (typeof arrayType === 'function' && typeof item !== 'object') {
+            if (typeof item !== arrayType && typeof arrayType !== 'function' || typeof arrayType === 'function' && typeof item !== 'object') {
                 throw new TypeError(`Property ${propertyKey} is not an array of ${arrayType}. It is an array of ${typeof item}.`);
             }
         }
@@ -84,12 +82,8 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
     }
 
     if (typeof type === 'function' && Object.getPrototypeOf(type.prototype).constructor.name === 'JsonConverter') {
-        if (typeof type.prototype.Deserialize !== 'function') {
-            throw new TypeError(`Property ${propertyKey} is a JsonConverter without a Deserialize method.`);
-        }
-
-        if (typeof type.prototype.Serialize !== 'function') {
-            throw new TypeError(`Property ${propertyKey} is a JsonConverter without a Serialize method.`);
+        if (typeof type.prototype.Deserialize !== 'function' || typeof type.prototype.Serialize !== 'function') {
+            throw new TypeError(`Property ${propertyKey} is a JsonConverter without a Serialize and/or Deserialize method.`);
         }
 
         return;
