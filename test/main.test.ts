@@ -382,7 +382,7 @@ describe('JsonProperty Nullability Tests', () => {
         expect(() => {
             return DeserializeObject({
                 int: 1,
-                test: 'test',
+                test: null,
             }, TestClass);
         }).not.toThrow();
     });

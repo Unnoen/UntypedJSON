@@ -54,7 +54,7 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
         type,
     } = properties;
 
-    if (typeof json[jsonProperty] === 'undefined' && nullabilityMode === (PropertyNullability.IGNORE || PropertyNullability.PASS)) {
+    if ((typeof json[jsonProperty] === 'undefined' || json[jsonProperty] === null) && nullabilityMode === (PropertyNullability.IGNORE || PropertyNullability.PASS)) {
         return;
     }
 
@@ -109,7 +109,7 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
  * @param {boolean} serialize Whether to serialize or deserialize.
  * @returns {void}
  */
-const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadata, fromObject: any, toObject: any, serialize = false): void => {
+const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadata, fromObject: any, toObject: any, serialize: boolean = false): void => {
     const {
         jsonProperty,
         array,
@@ -216,7 +216,7 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
  * @returns {object} The serialized JSON object.
  */
 export const SerializeObject = <T>(instance: T): object => {
-    const json: any = {};
+    const json: object = {};
 
     let classConstructor = instance.constructor;
 
