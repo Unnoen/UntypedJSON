@@ -26,11 +26,12 @@ import {
 export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullabilityMode: PropertyNullability = PropertyNullability.MAP) => {
     return function (target: any, propertyKey: string) {
         const isArray = Array.isArray(type);
-        const isClass = typeof type === 'function';
+        const isClass = isArray ? typeof type[0] === 'function' : typeof type === 'function';
+        const classType = (isClass ? (isArray ? type[0] : type) : undefined) as new() => any;
 
         const metadata: IJsonPropertyMetadata = {
             array: isArray,
-            classType: isClass ? type : undefined,
+            classType,
             jsonProperty,
             nested: isClass,
             nullabilityMode,

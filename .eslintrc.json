@@ -29,6 +29,7 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/indent": ["error", 4],
         "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-extra-parens": "off",
         "jsdoc/require-param-type": ["error"]
       }
     },

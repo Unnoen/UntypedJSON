@@ -1,3 +1,4 @@
+/* eslint-disable id-length */
 import {
     ANY,
     BOOLEAN,
@@ -152,19 +153,19 @@ describe('JsonProperty Deserialize Tests', () => {
 
     it('should deserialize array of class properties correctly', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         class Parent {
-            @JsonProperty('child', [Child])
+            @JsonProperty('c', [Child])
             public child: Child[];
         }
 
         const testJson = DeserializeObject({
-            child: [
+            c: [
                 {
-                    test: 'content',
+                    t: 'content',
                 },
             ],
         }, Parent);
@@ -255,8 +256,8 @@ describe('JsonProperty Serialize Tests', () => {
 
     it('should serialize a class with a nested class correctly', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
-            public test: string;
+            @JsonProperty('c', JsonType.STRING)
+            public child: string;
         }
 
         class TestClass {
@@ -266,15 +267,15 @@ describe('JsonProperty Serialize Tests', () => {
 
         const testJson = new TestClass();
         testJson.test = new Child();
-        testJson.test.test = 'test';
+        testJson.test.child = 'test';
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":{"test":"test"}}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":{"c":"test"}}');
     });
 
     it('should serialize a class with an array of nested classes correctly', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
-            public test: string;
+            @JsonProperty('c', JsonType.STRING)
+            public child: string;
         }
 
         class TestClass {
@@ -286,9 +287,9 @@ describe('JsonProperty Serialize Tests', () => {
         testJson.test = [
             new Child(),
         ];
-        testJson.test[0].test = 'test';
+        testJson.test[0].child = 'test';
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":[{"test":"test"}]}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":[{"c":"test"}]}');
     });
 });
 
@@ -367,7 +368,7 @@ describe('JsonProperty Nullability Tests', () => {
                 int: 1,
                 test: null,
             }, TestClass);
-        }).toThrow('Property test is not a string. It is a null.');
+        }).toThrow('Property test is not a string. It is null.');
     });
 
     it('should not throw an error when deserializing a property with null value and nullability set to ignore', () => {
