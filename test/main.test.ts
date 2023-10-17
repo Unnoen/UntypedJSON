@@ -100,16 +100,16 @@ describe('DeserializeObject Tests', () => {
 describe('JsonProperty Deserialize Tests', () => {
     it('should deserialize correctly', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         const testJson = DeserializeObject({
-            int: 1,
-            test: 'test',
+            i: 1,
+            t: 'test',
         }, TestClass);
 
         expect(testJson.int).toBe(1);
@@ -118,12 +118,12 @@ describe('JsonProperty Deserialize Tests', () => {
 
     it('should deserialize array properties correctly', () => {
         class TestClass {
-            @JsonProperty('test', [JsonType.STRING])
+            @JsonProperty('t', [JsonType.STRING])
             public test: string[];
         }
 
         const testJson = DeserializeObject({
-            test: [
+            t: [
                 'content',
             ],
         }, TestClass);
@@ -133,18 +133,18 @@ describe('JsonProperty Deserialize Tests', () => {
 
     it('should deserialize class properties correctly', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         class Parent {
-            @JsonProperty('child', Child)
+            @JsonProperty('c', Child)
             public child: Child;
         }
 
         const testJson = DeserializeObject({
-            child: {
-                test: 'content',
+            c: {
+                t: 'content',
             },
         }, Parent);
 
@@ -175,24 +175,24 @@ describe('JsonProperty Deserialize Tests', () => {
 
     it('should deserialize multi-nested class properties correctly', () => {
         class Child {
-            @JsonProperty('test', [JsonType.STRING])
+            @JsonProperty('t', [JsonType.STRING])
             public test: string;
         }
 
         class Parent {
-            @JsonProperty('child', Child)
+            @JsonProperty('c', Child)
             public child: Child;
         }
 
         class GrandParent {
-            @JsonProperty('parent', Parent)
+            @JsonProperty('p', Parent)
             public parent: Parent;
         }
 
         const testJson = DeserializeObject({
-            parent: {
-                child: {
-                    test: [
+            p: {
+                c: {
+                    t: [
                         'content',
                     ],
                 },
@@ -204,18 +204,18 @@ describe('JsonProperty Deserialize Tests', () => {
 
     it('should deserialize extended class properties correctly', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         class Parent extends Child {
-            @JsonProperty('test2', JsonType.STRING)
+            @JsonProperty('t2', JsonType.STRING)
             public test2: string;
         }
 
         const testJson = DeserializeObject({
-            test: 'content',
-            test2: 'content2',
+            t: 'content',
+            t2: 'content2',
         }, Parent);
 
         expect(testJson.test).toBe('content');
@@ -229,20 +229,20 @@ describe('JsonProperty Deserialize Tests', () => {
 describe('JsonProperty Serialize Tests', () => {
     it('should serialize a class correctly', () => {
         class TestClass {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         const testJson = new TestClass();
         testJson.test = 'test';
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":"test"}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"t":"test"}');
     });
 
     it('should serialize a class with an array correctly', () => {
         // noinspection JSMismatchedCollectionQueryUpdate - This is intentional.
         class TestClass {
-            @JsonProperty('test', [JsonType.STRING])
+            @JsonProperty('t', [JsonType.STRING])
             public test: string[];
         }
 
@@ -251,7 +251,7 @@ describe('JsonProperty Serialize Tests', () => {
             'test',
         ];
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":["test"]}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"t":["test"]}');
     });
 
     it('should serialize a class with a nested class correctly', () => {
@@ -261,7 +261,7 @@ describe('JsonProperty Serialize Tests', () => {
         }
 
         class TestClass {
-            @JsonProperty('test', Child)
+            @JsonProperty('t', Child)
             public test: Child;
         }
 
@@ -269,7 +269,7 @@ describe('JsonProperty Serialize Tests', () => {
         testJson.test = new Child();
         testJson.test.child = 'test';
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":{"c":"test"}}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"t":{"c":"test"}}');
     });
 
     it('should serialize a class with an array of nested classes correctly', () => {
@@ -279,7 +279,7 @@ describe('JsonProperty Serialize Tests', () => {
         }
 
         class TestClass {
-            @JsonProperty('test', [Child])
+            @JsonProperty('t', [Child])
             public test: Child[];
         }
 
@@ -289,7 +289,7 @@ describe('JsonProperty Serialize Tests', () => {
         ];
         testJson.test[0].child = 'test';
 
-        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"test":[{"c":"test"}]}');
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"t":[{"c":"test"}]}');
     });
 });
 
@@ -299,54 +299,54 @@ describe('JsonProperty Serialize Tests', () => {
 describe('JsonProperty Type Tests', () => {
     it('should throw an error when deserializing a property with the wrong type', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         expect(() => {
             return DeserializeObject({
-                int: '1',
-                test: 'test',
+                i: '1',
+                t: 'test',
             }, TestClass);
-        }).toThrow('Property int is not a number. It is a string.');
+        }).toThrow('Property i is not a number. It is a string.');
     });
 
     it('should throw an error when deserializing a property with the wrong type in an array', () => {
         class TestClass {
-            @JsonProperty('test', [JsonType.STRING])
+            @JsonProperty('t', [JsonType.STRING])
             public test: string[];
         }
 
         expect(() => {
             return DeserializeObject({
-                test: [
+                t: [
                     1,
                 ],
             }, TestClass);
-        }).toThrow('Property test is not an array of string. It is an array of number.');
+        }).toThrow('Property t is not an array of string. It is an array of number.');
     });
 
     it('should throw an error when deserializing a property with the wrong type in a class', () => {
         class Child {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         class Parent {
-            @JsonProperty('child', Child)
+            @JsonProperty('c', Child)
             public child: Child;
         }
 
         expect(() => {
             return DeserializeObject({
-                child: {
-                    test: 1,
+                c: {
+                    t: 1,
                 },
             }, Parent);
-        }).toThrow('Property test is not a string. It is a number.');
+        }).toThrow('Property t is not a string. It is a number.');
     });
 });
 
@@ -356,65 +356,65 @@ describe('JsonProperty Type Tests', () => {
 describe('JsonProperty Nullability Tests', () => {
     it('should throw an error when deserializing a property with null value and nullability set to map', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING, PropertyNullability.MAP)
+            @JsonProperty('t', JsonType.STRING, PropertyNullability.MAP)
             public test: string;
         }
 
         expect(() => {
             return DeserializeObject({
-                int: 1,
-                test: null,
+                i: 1,
+                t: null,
             }, TestClass);
-        }).toThrow('Property test is not a string. It is null.');
+        }).toThrow('Property t is not a string. It is null.');
     });
 
     it('should not throw an error when deserializing a property with null value and nullability set to ignore', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING, PropertyNullability.IGNORE)
+            @JsonProperty('t', JsonType.STRING, PropertyNullability.IGNORE)
             public test: string;
         }
 
         expect(() => {
             return DeserializeObject({
-                int: 1,
-                test: null,
+                i: 1,
+                t: null,
             }, TestClass);
         }).not.toThrow();
     });
 
     it('should not throw an error when deserializing a property not present in the class and nullability set to ignore', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING, PropertyNullability.IGNORE)
+            @JsonProperty('t', JsonType.STRING, PropertyNullability.IGNORE)
             public test: string;
         }
 
         expect(() => {
             return DeserializeObject({
-                int: 1,
+                i: 1,
             }, TestClass);
         }).not.toThrow();
     });
 
     it('should use the default value when deserializing a property not present in the JSON and nullability set to ignore', () => {
         class TestClass {
-            @JsonProperty('int', JsonType.NUMBER)
+            @JsonProperty('i', JsonType.NUMBER)
             public int: number;
 
-            @JsonProperty('test', JsonType.STRING, PropertyNullability.IGNORE)
+            @JsonProperty('t', JsonType.STRING, PropertyNullability.IGNORE)
             public test: string = 'test';
         }
 
         const testJson = DeserializeObject({
-            int: 1,
+            i: 1,
         }, TestClass);
 
         expect(testJson.test).toBe('test');
@@ -422,7 +422,7 @@ describe('JsonProperty Nullability Tests', () => {
 
     it('should deserialize an array property with a default value if nullability is set to ignore', () => {
         class TestClass {
-            @JsonProperty('test', [JsonType.STRING], PropertyNullability.IGNORE)
+            @JsonProperty('t', [JsonType.STRING], PropertyNullability.IGNORE)
             public test: string[] = ['test'];
         }
 
@@ -433,12 +433,12 @@ describe('JsonProperty Nullability Tests', () => {
 
     it('should throw an error if the property is not defined in the JSON', () => {
         class TestClass {
-            @JsonProperty('test', JsonType.STRING)
+            @JsonProperty('t', JsonType.STRING)
             public test: string;
         }
 
         expect(() => {
             DeserializeObject({}, TestClass);
-        }).toThrow('Property test is not defined in the JSON.\r\n{}');
+        }).toThrow('Property t is not defined in the JSON.\r\n{}');
     });
 });
