@@ -1,10 +1,8 @@
 import {
-    type JsonType,
-} from '../src';
-import {
     DeserializeObject,
     JsonConverter,
     JsonProperty,
+    type JsonType,
     SerializeObject,
 } from '../src';
 

@@ -1,8 +1,10 @@
 import {
+    type DeserializeOptions,
     type IJsonClassMetadata,
     type IJsonPropertyMetadata,
     JsonType,
     PropertyNullability,
+    type SerializeOptions,
 } from './types';
 
 export const metadataKey = Symbol('UntypedJSONMetadata');
@@ -107,9 +109,10 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
  * @param {any} fromObject The object to map from.
  * @param {any} toObject The object to map to.
  * @param {boolean} serialize Whether to serialize or deserialize.
+ * @param {DeserializeOptions | SerializeOptions} options The options for deserialization or serialization.
  * @returns {void}
  */
-const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadata, fromObject: any, toObject: any, serialize: boolean = false): void => {
+const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadata, fromObject: any, toObject: any, serialize: boolean = false, options?: DeserializeOptions | SerializeOptions): void => {
     const {
         jsonProperty,
         array,
@@ -133,10 +136,10 @@ const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadat
     if (nested) {
         if (array) {
             toObject[toKey] = fromObject[fromKey].map((item: any) => {
-                return serialize ? SerializeObject(item) : DeserializeObject(item, classType);
+                return serialize ? SerializeObject(item, options) : DeserializeObject(item, classType, options);
             });
         } else {
-            toObject[toKey] = serialize ? SerializeObject(fromObject[fromKey]) : DeserializeObject(fromObject[fromKey], classType);
+            toObject[toKey] = serialize ? SerializeObject(fromObject[fromKey], options) : DeserializeObject(fromObject[fromKey], classType, options);
         }
     } else if (array) {
         if (classType === undefined) {
@@ -165,11 +168,12 @@ const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadat
  * @template T
  * @param {object | string} json The JSON object to deserialize. Can be a string or an object.
  * @param {T} classReference The class reference to deserialize the JSON object into.
+ * @param {DeserializeOptions} options The options for deserialization.
  * @returns {T} The deserialized instance of the class.
  * @throws {TypeError} If the JSON object is not an object or string.
  * @throws {ReferenceError} If the property is not defined in the JSON.
  */
-export const DeserializeObject = <T>(json: object | string, classReference: new() => T): T => {
+export const DeserializeObject = <T>(json: object | string, classReference: new() => T, options?: DeserializeOptions): T => {
     const jsonObject: object = typeof json === 'string' ? JSON.parse(json) : json;
 
     if (typeof jsonObject !== 'object') {
@@ -189,7 +193,7 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
             });
 
         for (const mixin of classMetadata.mixins) {
-            const mixinObject = DeserializeObject(jsonObject, mixin);
+            const mixinObject = DeserializeObject(jsonObject, mixin, options);
             Object.assign(instance, mixinObject);
 
             const mixinKeys = Object.getOwnPropertyNames(mixin.prototype);
@@ -206,7 +210,17 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
         for (const propertyKey of propertyKeys) {
             verifyNullability(propertyKey, classMetadata.properties[propertyKey], jsonObject);
             verifyType(propertyKey, classMetadata.properties[propertyKey], jsonObject);
-            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance);
+            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance, false, options);
+        }
+
+        if (options?.passUnknownProperties) {
+            const unknownProperties = Object.keys(jsonObject).filter((key) => {
+                return !propertyKeys.includes(key);
+            });
+
+            for (const unknownProperty of unknownProperties) {
+                instance[unknownProperty] = jsonObject[unknownProperty];
+            }
         }
 
         classConstructor = Object.getPrototypeOf(classConstructor);
@@ -219,9 +233,10 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
  * Serializes an instance of a class into a JSON object.
  * @template T
  * @param {T} instance The instance of the class to serialize.
+ * @param {SerializeOptions} options The options for serialization.
  * @returns {object} The serialized JSON object.
  */
-export const SerializeObject = <T>(instance: T): object => {
+export const SerializeObject = <T>(instance: T, options?: SerializeOptions): object => {
     const json: object = {};
 
     let classConstructor = instance.constructor;
@@ -237,7 +252,17 @@ export const SerializeObject = <T>(instance: T): object => {
         const propertyKeys = Object.keys(classMetadata?.properties);
 
         for (const propertyKey of propertyKeys) {
-            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], instance, json, true);
+            mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], instance, json, true, options);
+        }
+
+        if (options?.passUnknownProperties && classConstructor === instance.constructor) {
+            const unknownProperties = Object.keys(instance).filter((key) => {
+                return !propertyKeys.includes(key);
+            });
+
+            for (const unknownProperty of unknownProperties) {
+                json[unknownProperty] = instance[unknownProperty];
+            }
         }
 
         classConstructor = Object.getPrototypeOf(classConstructor);

@@ -4,6 +4,22 @@ import {
 } from './converters';
 
 /**
+ * Represents the options for deserializing an object.
+ * @property {boolean} [passUnknownProperties=false] - Determines whether unknown properties should be passed or ignored during deserialization from JSON.
+ */
+export type DeserializeOptions = {
+    passUnknownProperties?: boolean,
+};
+
+/**
+ * Options for serializing objects.
+ * @property {boolean} [passUnknownProperties=false] - Determines whether unknown properties should be passed or ignored during serialization to JSON.
+ */
+export type SerializeOptions = {
+    passUnknownProperties?: boolean,
+};
+
+/**
  * The type the JSON property is deserialized to.
  * This can be a primitive type using JsonType, a class, an array of either, or a custom JsonConverter.
  */

@@ -442,3 +442,135 @@ describe('JsonProperty Nullability Tests', () => {
         }).toThrow('Property t is not defined in the JSON.\r\n{}');
     });
 });
+
+describe('DeserializeOptions Tests', () => {
+    it('should pass unknown properties if passUnknownProperties is true', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'test',
+            test2: 'test2',
+        }, TestClass, {
+            passUnknownProperties: true,
+        });
+
+        expect(testJson.test).toBe('test');
+        expect((testJson as any).test2).toBe('test2');
+    });
+
+    it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
+        class Child {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        class Parent {
+            @JsonProperty('c', Child)
+            public child: Child;
+        }
+
+        const testJson = DeserializeObject({
+            c: {
+                t: 'test',
+                test2: 'test2',
+            },
+        }, Parent, {
+            passUnknownProperties: true,
+        });
+
+        expect(testJson.child.test).toBe('test');
+        expect((testJson.child as any).test2).toBe('test2');
+    });
+
+    it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'test',
+            test2: 'test2',
+        }, TestClass, {
+            passUnknownProperties: false,
+        });
+
+        expect(testJson.test).toBe('test');
+        expect((testJson as any).test2).toBeUndefined();
+
+        class TestClass2 {
+            @JsonProperty('test', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson2 = DeserializeObject({
+            test: 'test',
+            test2: 'test2',
+        }, TestClass2);
+
+        expect(testJson2.test).toBe('test');
+        expect((testJson2 as any).test2).toBeUndefined();
+    });
+});
+
+describe('SerializeOptions Tests', () => {
+    it('should pass unknown properties if passUnknownProperties is true', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson = new TestClass();
+        testJson.test = 'test';
+        (testJson as any).test2 = 'test2';
+
+        expect(JSON.stringify(SerializeObject(testJson, {
+            passUnknownProperties: true,
+        }))).toBe('{"t":"test","test2":"test2"}');
+    });
+
+    it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
+        class Child {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        class Parent {
+            @JsonProperty('c', Child)
+            public child: Child;
+        }
+
+        const testJson = new Parent();
+        testJson.child = new Child();
+        testJson.child.test = 'test';
+        (testJson.child as any).test2 = 'test2';
+
+        expect(JSON.stringify(SerializeObject(testJson, {
+            passUnknownProperties: true,
+        }))).toBe('{"c":{"t":"test","test2":"test2"}}');
+    });
+
+    it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson = new TestClass();
+        testJson.test = 'test';
+        (testJson as any).test2 = 'test2';
+
+        expect(JSON.stringify(SerializeObject(testJson, {
+            passUnknownProperties: false,
+        }))).toBe('{"t":"test"}');
+
+        const testJson2 = new TestClass();
+        testJson2.test = 'test';
+        (testJson2 as any).test2 = 'test2';
+
+        expect(JSON.stringify(SerializeObject(testJson2))).toBe('{"t":"test"}');
+    });
+});
