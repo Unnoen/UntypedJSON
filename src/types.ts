@@ -41,7 +41,7 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
  */
 export type IJsonPropertyMetadata = {
     array: boolean,
-    classType: new() => any,
+    classType?: new() => any,
     jsonProperty: string,
     nested: boolean,
     nullabilityMode?: PropertyNullability,

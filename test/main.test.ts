@@ -351,6 +351,55 @@ describe('JsonProperty Type Tests', () => {
             }, Parent);
         }).toThrow('Property t is not a string. It is a number.');
     });
+
+    it('should infer the type from the default value if type not passed', () => {
+        class TestClass {
+            @JsonProperty('t')
+            public test = 'default';
+        }
+
+        class TestClass2 {
+            @JsonProperty('t')
+            public test = 1;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'test',
+        }, TestClass);
+
+        const testJson2 = DeserializeObject({
+            t: 1,
+        }, TestClass2);
+
+        expect(testJson.test).toBe('test');
+        expect(testJson2.test).toBe(1);
+    });
+
+    it('should use the passed in type even if a default value is passed', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test = 1;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'text',
+        }, TestClass);
+
+        expect(testJson.test).toBe('text');
+    });
+
+    it('should throw an error if type is not passed and a default value is not provided', () => {
+        class TestClass {
+            @JsonProperty('t')
+            public test: number;
+        }
+
+        expect(() => {
+            DeserializeObject({
+                t: 'text',
+            }, TestClass);
+        }).toThrow('Property test does not have a type and cannot be inferred from the default value.');
+    });
 });
 
 /**

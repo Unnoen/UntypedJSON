@@ -25,7 +25,7 @@ import {
  *    public testArray: string[] = [];
  * }
  */
-export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullabilityMode?: PropertyNullability) => {
+export const JsonProperty = (jsonProperty: string, type?: DeserializeType, nullabilityMode?: PropertyNullability) => {
     return function (target: any, propertyKey: string) {
         const isArray = Array.isArray(type);
         const isClass = isArray ? typeof type[0] === 'function' : typeof type === 'function';

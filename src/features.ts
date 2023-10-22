@@ -3,6 +3,7 @@ import {
 } from './helpers';
 import {
     type DeserializeOptions,
+    type DeserializeType,
     type IJsonClassMetadata,
     type IJsonPropertyMetadata,
     JsonType,
@@ -47,15 +48,25 @@ const verifyNullability = (propertyKey: string, properties: IJsonPropertyMetadat
  * @param {string} propertyKey The property key.
  * @param {IJsonPropertyMetadata} properties The property metadata.
  * @param {object} json The JSON object.
+ * @param {string} inferredType The inferred type from the default property value.
  * @returns {void}
  * @throws {TypeError} If the type is incorrect or the property is an array of multiple types.
  */
-const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json: object): void => {
+const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json: object, inferredType?: string): void => {
     const {
         jsonProperty,
         nullabilityMode,
-        type,
     } = properties;
+
+    let type = properties.type;
+
+    if (type === undefined && inferredType === undefined) {
+        throw new TypeError(`Property ${propertyKey} does not have a type and cannot be inferred from the default value.`);
+    }
+
+    if (inferredType !== undefined && type === undefined) {
+        type = inferredType as DeserializeType;
+    }
 
     if ((typeof json[jsonProperty] === 'undefined' || json[jsonProperty] === null) && nullabilityMode === (PropertyNullability.IGNORE || PropertyNullability.PASS)) {
         return;
@@ -99,7 +110,7 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
     }
 
     if (type !== typeof json[jsonProperty] && type !== JsonType.ANY) {
-        throw new TypeError(`Property ${jsonProperty} is not a ${type}. It is a ${typeof json[jsonProperty]}.`);
+        throw new TypeError(`Property ${jsonProperty} is not a ${type}${inferredType ? ' (inferred)' : ''}. It is a ${typeof json[jsonProperty]}.`);
     }
 };
 
@@ -125,6 +136,11 @@ const mapObjectProperty = (propertyKey: string, properties: IJsonPropertyMetadat
 
     const fromKey = serialize ? propertyKey : jsonProperty;
     const toKey = serialize ? jsonProperty : propertyKey;
+
+    if (!serialize) {
+        const inferredType = toObject[toKey] === null || toObject[toKey] === undefined ? undefined : typeof toObject[toKey];
+        verifyType(propertyKey, properties, fromObject, inferredType);
+    }
 
     if (typeof type === 'function' && typeof type.prototype.Deserialize === 'function') {
         toObject[toKey] = type.prototype.Deserialize(fromObject[fromKey]);
@@ -206,7 +222,6 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
         for (const propertyKey of propertyKeys) {
             classMetadata.properties[propertyKey].nullabilityMode ??= classMetadata.options?.defaultNullabilityMode ?? PropertyNullability.MAP;
             verifyNullability(propertyKey, classMetadata.properties[propertyKey], jsonObject);
-            verifyType(propertyKey, classMetadata.properties[propertyKey], jsonObject);
             mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance, false, options);
         }
 
