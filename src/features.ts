@@ -1,4 +1,7 @@
 import {
+    GetOrCreateClassMetaData,
+} from './helpers';
+import {
     type DeserializeOptions,
     type IJsonClassMetadata,
     type IJsonPropertyMetadata,
@@ -6,8 +9,6 @@ import {
     PropertyNullability,
     type SerializeOptions,
 } from './types';
-
-export const metadataKey = Symbol('UntypedJSONMetadata');
 
 /**
  * Verifies that the JSON object has all the required properties.
@@ -185,12 +186,7 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
     let classConstructor = classReference;
 
     while (classConstructor !== null && classConstructor?.prototype !== Object.prototype) {
-        const classMetadata: IJsonClassMetadata = classConstructor.hasOwnProperty(metadataKey) ?
-            classConstructor[metadataKey] :
-            Object.create({
-                mixins: [],
-                properties: Object.create(null),
-            });
+        const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(classConstructor);
 
         for (const mixin of classMetadata.mixins) {
             const mixinObject = DeserializeObject(jsonObject, mixin, options);
@@ -208,6 +204,7 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
         const propertyKeys = Object.keys(classMetadata?.properties);
 
         for (const propertyKey of propertyKeys) {
+            classMetadata.properties[propertyKey].nullabilityMode ??= classMetadata.options?.defaultNullabilityMode ?? PropertyNullability.MAP;
             verifyNullability(propertyKey, classMetadata.properties[propertyKey], jsonObject);
             verifyType(propertyKey, classMetadata.properties[propertyKey], jsonObject);
             mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance, false, options);
@@ -242,12 +239,7 @@ export const SerializeObject = <T>(instance: T, options?: SerializeOptions): obj
     let classConstructor = instance.constructor;
 
     while (classConstructor !== null && classConstructor?.prototype !== Object.prototype) {
-        const classMetadata: IJsonClassMetadata = classConstructor.hasOwnProperty(metadataKey) ?
-            classConstructor[metadataKey] :
-            Object.create({
-                mixins: [],
-                properties: Object.create(null),
-            });
+        const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(classConstructor);
 
         const propertyKeys = Object.keys(classMetadata?.properties);
 

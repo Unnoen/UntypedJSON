@@ -44,8 +44,12 @@ export type IJsonPropertyMetadata = {
     classType: new() => any,
     jsonProperty: string,
     nested: boolean,
-    nullabilityMode: PropertyNullability,
+    nullabilityMode?: PropertyNullability,
     type?: DeserializeType,
+};
+
+export type IJsonClassOptions = {
+    defaultNullabilityMode?: PropertyNullability,
 };
 
 /**
@@ -55,8 +59,9 @@ export type IJsonPropertyMetadata = {
  * @property {Map<string, IJsonPropertyMetadata>} properties - The properties of the class.
  */
 export type IJsonClassMetadata = {
-    mixins: Array<new() => any>,
-    properties: Map<string, IJsonPropertyMetadata>,
+    mixins?: Array<new() => any>,
+    options?: IJsonClassOptions,
+    properties?: Map<string, IJsonPropertyMetadata>,
 };
 
 /**

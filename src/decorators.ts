@@ -1,12 +1,14 @@
 import {
-    metadataKey,
-} from './features';
+    GetOrCreateClassMetaData,
+    MetadataKey,
+} from './helpers';
 import {
     type Constructor,
     type DeserializeType,
     type IJsonClassMetadata,
+    type IJsonClassOptions,
     type IJsonPropertyMetadata,
-    PropertyNullability,
+    type PropertyNullability,
 } from './types';
 
 /**
@@ -23,7 +25,7 @@ import {
  *    public testArray: string[] = [];
  * }
  */
-export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullabilityMode: PropertyNullability = PropertyNullability.MAP) => {
+export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullabilityMode?: PropertyNullability) => {
     return function (target: any, propertyKey: string) {
         const isArray = Array.isArray(type);
         const isClass = isArray ? typeof type[0] === 'function' : typeof type === 'function';
@@ -39,18 +41,9 @@ export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullab
         };
 
         const targetConstructor = target.constructor;
-        const classMetadata: IJsonClassMetadata = targetConstructor.hasOwnProperty(metadataKey) ? targetConstructor[metadataKey] : Object.create({
-            mixins: [],
-            properties: Object.create(null),
-        });
-        const propertiesMetadata = classMetadata?.hasOwnProperty('properties') ? classMetadata.properties : Object.create(null);
-
-        propertiesMetadata[propertyKey] = metadata;
-
-        targetConstructor[metadataKey] = {
-            mixins: [],
-            properties: propertiesMetadata,
-        } as IJsonClassMetadata;
+        const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(targetConstructor);
+        classMetadata.properties[propertyKey] = metadata;
+        targetConstructor[MetadataKey] = classMetadata;
     };
 };
 
@@ -70,13 +63,20 @@ export const JsonProperty = (jsonProperty: string, type: DeserializeType, nullab
  */
 export const JsonMixin = <T extends Constructor[]> (...classes: T) => {
     return function <C extends Constructor>(target: C): void {
-        const classMetadata: IJsonClassMetadata = target.hasOwnProperty(metadataKey) ? target[metadataKey] : Object.create({
-            mixins: [],
-            properties: Object.create(null),
-        });
+        const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(target);
 
         classMetadata.mixins = classes;
 
-        target[metadataKey] = classMetadata;
+        target[MetadataKey] = classMetadata;
+    };
+};
+
+export const JsonOptions = (options: IJsonClassOptions) => {
+    return function <C extends Constructor>(target: C): void {
+        const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(target);
+
+        classMetadata.options = options;
+
+        target[MetadataKey] = classMetadata;
     };
 };

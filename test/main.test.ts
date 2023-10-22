@@ -11,6 +11,9 @@ import {
     SerializeObject,
     STRING,
 } from '../src';
+import {
+    JsonOptions,
+} from '../src/decorators';
 
 /**
  * Tests for the JsonType enum.
@@ -440,6 +443,46 @@ describe('JsonProperty Nullability Tests', () => {
         expect(() => {
             DeserializeObject({}, TestClass);
         }).toThrow('Property t is not defined in the JSON.\r\n{}');
+    });
+});
+
+describe('JsonOptions Tests', () => {
+    it('should use the default nullability mode if not passed', () => {
+        @JsonOptions({
+            defaultNullabilityMode: PropertyNullability.IGNORE,
+        })
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        const testJson = DeserializeObject({
+            t: null,
+        }, TestClass);
+
+        expect(testJson.test).toBeUndefined();
+    });
+
+    it('should only apply the options to the class it is applied to', () => {
+        @JsonOptions({
+            defaultNullabilityMode: PropertyNullability.IGNORE,
+        })
+        class Parent {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+        }
+
+        class Child extends Parent {
+            @JsonProperty('t2', JsonType.STRING)
+            public test2: string;
+        }
+
+        expect(() => {
+            return DeserializeObject({
+                t: null,
+                t2: null,
+            }, Child);
+        }).toThrow('Property t2 is not a string. It is null.');
     });
 });
 
