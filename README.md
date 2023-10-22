@@ -47,6 +47,7 @@ Yarn
 ## Usage
 It's super simple to use.
 Just decorate your class with `@JsonProperty`, the name of the JSON property and the type of the property.
+Or set a default value for it to be inferred automatically!
 
 Then use the `DeserializeObject` function to parse the JSON string or object into an instance of your class.
 
@@ -64,7 +65,7 @@ Make sure you have these options enabled in your `tsconfig.json`:
 ```
 
 ### Simple Types
-You have to use the provided `JsonType` enum so that the parser knows how to parse the value.
+You have to use the provided `JsonType` enum so that the parser knows how to parse the value, or provide a default value.
 
 ```ts
 import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
@@ -77,15 +78,21 @@ class Person {
 
   @JsonProperty('a', JsonType.NUMBER)
   public age: number;
+
+  // We can set a default value to infer the type automatically!
+  // In this case, the parser knows it's a string.
+  @JsonProperty('o')
+  public occupation = 'Unemployed';
 }
 
-const jsonString = '{"fn": "John Doe", "a": 42}';
+const jsonString = '{"fn": "John Doe", "a": 42, "o": "Software Engineer"}';
 
 const person = DeserializeObject(jsonString, Person);
 
 // Now we can use our own property names!
 console.log(person.name); // John Doe
 console.log(person.age); // 42
+console.log(person.occupation); // Software Engineer
 ```
 
 You can also import the `JsonType` constants directly if that's more your style.
@@ -205,6 +212,8 @@ console.log(person.age); // undefined
 ### Default Values
 If you want to set a default value, just set it in the initializer.
 
+Setting a default value means you don't need to specify the type of the property; it will be inferred. (Unless you want to override it!)
+
 Make sure to set the `PropertyNullability` to `PropertyNullability.IGNORE` so that the parser doesn't override it!
 
 ```ts
@@ -216,14 +225,18 @@ class Person {
     
     @JsonProperty('a', JsonType.NUMBER, PropertyNullability.IGNORE)
     public age: number = 42;
+    
+    @JsonProperty('o')
+    public occupation = 'Unemployed';
 }
 
-const jsonString = '{"fn": "John Doe"}';
+const jsonString = '{"fn": "John Doe", "o": "Software Engineer"}';
 
 const person = DeserializeObject(jsonString, Person);
 
 console.log(person.name); // John Doe
 console.log(person.age); // 42
+console.log(person.occupation); // Software Engineer
 ```
 
 ### Custom Deserializers & Serializers

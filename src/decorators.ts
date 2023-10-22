@@ -14,8 +14,12 @@ import {
 /**
  * Decorator for properties that should be serialized and deserialized.
  * @param {string} jsonProperty The name of the property in the JSON.
- * @param {DeserializeType} type The type of the property. Can be a primitive type, a class, an array of either, or a JsonConverter
- * @param {PropertyNullability} nullabilityMode The nullability mode of the property.
+ * @param {DeserializeType} [type] The type of the property.
+ * Can be a primitive type, a class, an array of either, or a JsonConverter.
+ * Optional if a default value is provided, as it will infer the type from the default value.
+ * @param {PropertyNullability} [nullabilityMode] The nullability mode of the property.
+ * Defaults to PropertyNullability.MAP.
+ * A different default can be set with the @JsonOptions decorator.
  * @example
  * class TestClass {
  *    \@JsonProperty('test', JsonType.STRING)
@@ -71,6 +75,10 @@ export const JsonMixin = <T extends Constructor[]> (...classes: T) => {
     };
 };
 
+/**
+ * Decorator function that applies JSON options to a class.
+ * @param {IJsonClassOptions} options - The JSON options to apply.
+ */
 export const JsonOptions = (options: IJsonClassOptions) => {
     return function <C extends Constructor>(target: C): void {
         const classMetadata: IJsonClassMetadata = GetOrCreateClassMetaData(target);

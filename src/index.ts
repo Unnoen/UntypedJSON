@@ -3,6 +3,7 @@ export {
 } from './converters';
 export {
     JsonMixin,
+    JsonOptions,
     JsonProperty,
 } from './decorators';
 export {
