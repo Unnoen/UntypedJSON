@@ -225,9 +225,11 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
             mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance, false, options);
         }
 
-        if (options?.passUnknownProperties) {
+        if (options?.passUnknownProperties && classConstructor?.prototype !== undefined) {
             const unknownProperties = Object.keys(jsonObject).filter((key) => {
-                return !propertyKeys.includes(key);
+                return !Object.values(classMetadata.properties).some((property) => {
+                    return property.jsonProperty === key;
+                });
             });
 
             for (const unknownProperty of unknownProperties) {

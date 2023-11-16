@@ -53,7 +53,9 @@ describe('DeserializeObject Tests', () => {
 
         const testJson = DeserializeObject('{"t": "test"}', TestClass);
 
-        expect(testJson.test).toBe('test');
+        expect(testJson).toEqual({
+            test: 'test',
+        });
     });
 
     it('should throw an error if the JSON string is invalid', () => {
@@ -115,8 +117,10 @@ describe('JsonProperty Deserialize Tests', () => {
             t: 'test',
         }, TestClass);
 
-        expect(testJson.int).toBe(1);
-        expect(testJson.test).toBe('test');
+        expect(testJson).toEqual({
+            int: 1,
+            test: 'test',
+        });
     });
 
     it('should deserialize array properties correctly', () => {
@@ -131,7 +135,11 @@ describe('JsonProperty Deserialize Tests', () => {
             ],
         }, TestClass);
 
-        expect(testJson.test[0]).toBe('content');
+        expect(testJson).toEqual({
+            test: [
+                'content',
+            ],
+        });
     });
 
     it('should deserialize class properties correctly', () => {
@@ -151,7 +159,11 @@ describe('JsonProperty Deserialize Tests', () => {
             },
         }, Parent);
 
-        expect(testJson.child.test).toBe('content');
+        expect(testJson).toEqual({
+            child: {
+                test: 'content',
+            },
+        });
     });
 
     it('should deserialize array of class properties correctly', () => {
@@ -173,7 +185,13 @@ describe('JsonProperty Deserialize Tests', () => {
             ],
         }, Parent);
 
-        expect(testJson.child[0].test).toBe('content');
+        expect(testJson).toEqual({
+            child: [
+                {
+                    test: 'content',
+                },
+            ],
+        });
     });
 
     it('should deserialize multi-nested class properties correctly', () => {
@@ -202,7 +220,15 @@ describe('JsonProperty Deserialize Tests', () => {
             },
         }, GrandParent);
 
-        expect(testJson.parent.child.test[0]).toBe('content');
+        expect(testJson).toEqual({
+            parent: {
+                child: {
+                    test: [
+                        'content',
+                    ],
+                },
+            },
+        });
     });
 
     it('should deserialize extended class properties correctly', () => {
@@ -221,8 +247,10 @@ describe('JsonProperty Deserialize Tests', () => {
             t2: 'content2',
         }, Parent);
 
-        expect(testJson.test).toBe('content');
-        expect(testJson.test2).toBe('content2');
+        expect(testJson).toEqual({
+            test: 'content',
+            test2: 'content2',
+        });
     });
 });
 
@@ -371,8 +399,13 @@ describe('JsonProperty Type Tests', () => {
             t: 1,
         }, TestClass2);
 
-        expect(testJson.test).toBe('test');
-        expect(testJson2.test).toBe(1);
+        expect(testJson).toEqual({
+            test: 'test',
+        });
+
+        expect(testJson2).toEqual({
+            test: 1,
+        });
     });
 
     it('should use the passed in type even if a default value is passed', () => {
@@ -385,7 +418,9 @@ describe('JsonProperty Type Tests', () => {
             t: 'text',
         }, TestClass);
 
-        expect(testJson.test).toBe('text');
+        expect(testJson).toEqual({
+            test: 'text',
+        });
     });
 
     it('should throw an error if type is not passed and a default value is not provided', () => {
@@ -469,7 +504,10 @@ describe('JsonProperty Nullability Tests', () => {
             i: 1,
         }, TestClass);
 
-        expect(testJson.test).toBe('test');
+        expect(testJson).toEqual({
+            int: 1,
+            test: 'test',
+        });
     });
 
     it('should deserialize an array property with a default value if nullability is set to ignore', () => {
@@ -480,7 +518,9 @@ describe('JsonProperty Nullability Tests', () => {
 
         const testJson = DeserializeObject({}, TestClass);
 
-        expect(testJson.test).toEqual(['test']);
+        expect(testJson).toEqual({
+            test: ['test'],
+        });
     });
 
     it('should throw an error if the property is not defined in the JSON', () => {
@@ -549,8 +589,10 @@ describe('DeserializeOptions Tests', () => {
             passUnknownProperties: true,
         });
 
-        expect(testJson.test).toBe('test');
-        expect((testJson as any).test2).toBe('test2');
+        expect(testJson).toEqual({
+            test: 'test',
+            test2: 'test2',
+        });
     });
 
     it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
@@ -573,8 +615,12 @@ describe('DeserializeOptions Tests', () => {
             passUnknownProperties: true,
         });
 
-        expect(testJson.child.test).toBe('test');
-        expect((testJson.child as any).test2).toBe('test2');
+        expect(testJson).toEqual({
+            child: {
+                test: 'test',
+                test2: 'test2',
+            },
+        });
     });
 
     it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
@@ -603,8 +649,9 @@ describe('DeserializeOptions Tests', () => {
             test2: 'test2',
         }, TestClass2);
 
-        expect(testJson2.test).toBe('test');
-        expect((testJson2 as any).test2).toBeUndefined();
+        expect(testJson2).toEqual({
+            test: 'test',
+        });
     });
 });
 
