@@ -19,3 +19,12 @@ export const GetOrCreateClassMetaData = (constructor: Function): IJsonClassMetad
         properties: Object.create(null),
     });
 };
+
+/**
+ * Check if a given type is a built-in type (String, Number, Boolean).
+ * @param {any} type - The type to check.
+ * @returns {boolean} - True if the given type is a built-in type, false otherwise.
+ */
+export const isBuiltInType = (type: any): boolean => {
+    return type === String || type === Number || type === Boolean;
+};

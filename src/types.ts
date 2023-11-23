@@ -23,10 +23,15 @@ export type SerializeOptions = {
 };
 
 /**
+ * Represents a built-in constructor type in JavaScript.
+ */
+export type BuiltInConstructorType = StringConstructor | NumberConstructor | BooleanConstructor;
+
+/**
  * The type the JSON property is deserialized to.
  * This can be a primitive type using JsonType, a class, an array of either, or a custom JsonConverter.
  */
-export type DeserializeType = Array<JsonConverter<any>> | Array<new() => any> | JsonConverter<any> | JsonType | JsonType[] | (new() => any);
+export type DeserializeType = Array<JsonConverter<any>> | Array<new() => any> | JsonConverter<any> | JsonType | JsonType[] | (new() => any) | BuiltInConstructorType | BuiltInConstructorType[];
 
 /**
  * The type of the constructor.

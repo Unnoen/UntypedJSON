@@ -3,6 +3,7 @@ import {
     ANY,
     BOOLEAN,
     DeserializeObject,
+    JsonOptions,
     JsonProperty,
     JsonType,
     NUMBER,
@@ -11,9 +12,6 @@ import {
     SerializeObject,
     STRING,
 } from '../src';
-import {
-    JsonOptions,
-} from '../src/decorators';
 
 /**
  * Tests for the JsonType enum.
@@ -252,6 +250,40 @@ describe('JsonProperty Deserialize Tests', () => {
             test2: 'content2',
         });
     });
+
+    it('should deserialize with built in constructors correctly', () => {
+        class TestClass {
+            @JsonProperty('i', Number)
+            public int: number;
+
+            @JsonProperty('t', String)
+            public test: string;
+
+            @JsonProperty('b', Boolean)
+            public bool: boolean;
+
+            @JsonProperty('a', [String])
+            public array: string[];
+        }
+
+        const testJson = DeserializeObject({
+            a: [
+                'test',
+            ],
+            b: true,
+            i: 1,
+            t: 'test',
+        }, TestClass);
+
+        expect(testJson).toEqual({
+            array: [
+                'test',
+            ],
+            bool: true,
+            int: 1,
+            test: 'test',
+        });
+    });
 });
 
 /**
@@ -321,6 +353,32 @@ describe('JsonProperty Serialize Tests', () => {
         testJson.test[0].child = 'test';
 
         expect(JSON.stringify(SerializeObject(testJson))).toBe('{"t":[{"c":"test"}]}');
+    });
+
+    it('should serialize with built in constructors correctly', () => {
+        class TestClass {
+            @JsonProperty('i', Number)
+            public int: number;
+
+            @JsonProperty('t', String)
+            public test: string;
+
+            @JsonProperty('b', Boolean)
+            public bool: boolean;
+
+            @JsonProperty('a', [String])
+            public array: string[];
+        }
+
+        const testJson = new TestClass();
+        testJson.array = [
+            'test',
+        ];
+        testJson.bool = true;
+        testJson.int = 1;
+        testJson.test = 'test';
+
+        expect(JSON.stringify(SerializeObject(testJson))).toBe('{"i":1,"t":"test","b":true,"a":["test"]}');
     });
 });
 
@@ -606,169 +664,175 @@ describe('JsonOptions Tests', () => {
 });
 
 describe('DeserializeOptions Tests', () => {
-    it('should pass unknown properties if passUnknownProperties is true', () => {
-        class TestClass {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
+    describe('passUnknownProperties Tests', () => {
+        it('should pass unknown properties if passUnknownProperties is true', () => {
+            class TestClass {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
 
-        const testJson = DeserializeObject({
-            t: 'test',
-            test2: 'test2',
-        }, TestClass, {
-            passUnknownProperties: true,
-        });
-
-        expect(testJson).toEqual({
-            test: 'test',
-            test2: 'test2',
-        });
-    });
-
-    it('should map JSON properties to class properties of the same name if mapClassNames is true', () => {
-        class TestClass {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-
-            public test2?: string = undefined;
-
-            public test3?: string[] = undefined;
-
-            public test4: number = 1;
-        }
-
-        const testJson = DeserializeObject({
-            t: 'test',
-            test2: 'test2',
-            test3: ['test3'],
-            test4: 2,
-        }, TestClass, {
-            mapClassProperties: true,
-        });
-
-        expect(testJson).toEqual({
-            test: 'test',
-            test2: 'test2',
-            test3: ['test3'],
-            test4: 2,
-        });
-    });
-
-    it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
-        class Child {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
-
-        class Parent {
-            @JsonProperty('c', Child)
-            public child: Child;
-        }
-
-        const testJson = DeserializeObject({
-            c: {
+            const testJson = DeserializeObject({
                 t: 'test',
                 test2: 'test2',
-            },
-        }, Parent, {
-            passUnknownProperties: true,
-        });
+            }, TestClass, {
+                passUnknownProperties: true,
+            });
 
-        expect(testJson).toEqual({
-            child: {
+            expect(testJson).toEqual({
                 test: 'test',
                 test2: 'test2',
-            },
+            });
+        });
+
+        it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
+            class Child {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
+
+            class Parent {
+                @JsonProperty('c', Child)
+                public child: Child;
+            }
+
+            const testJson = DeserializeObject({
+                c: {
+                    t: 'test',
+                    test2: 'test2',
+                },
+            }, Parent, {
+                passUnknownProperties: true,
+            });
+
+            expect(testJson).toEqual({
+                child: {
+                    test: 'test',
+                    test2: 'test2',
+                },
+            });
+        });
+
+        it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
+            class TestClass {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
+
+            const testJson = DeserializeObject({
+                t: 'test',
+                test2: 'test2',
+            }, TestClass, {
+                passUnknownProperties: false,
+            });
+
+            expect(testJson.test).toBe('test');
+            expect((testJson as any).test2).toBeUndefined();
+
+            class TestClass2 {
+                @JsonProperty('test', JsonType.STRING)
+                public test: string;
+            }
+
+            const testJson2 = DeserializeObject({
+                test: 'test',
+                test2: 'test2',
+            }, TestClass2);
+
+            expect(testJson2).toEqual({
+                test: 'test',
+            });
         });
     });
 
-    it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
-        class TestClass {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
+    describe('mapClassProperties Tests', () => {
+        it('should map JSON properties to class properties of the same name if mapClassNames is true', () => {
+            class TestClass {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
 
-        const testJson = DeserializeObject({
-            t: 'test',
-            test2: 'test2',
-        }, TestClass, {
-            passUnknownProperties: false,
-        });
+                public test2?: string = undefined;
 
-        expect(testJson.test).toBe('test');
-        expect((testJson as any).test2).toBeUndefined();
+                public test3?: string[] = undefined;
 
-        class TestClass2 {
-            @JsonProperty('test', JsonType.STRING)
-            public test: string;
-        }
+                public test4: number = 1;
+            }
 
-        const testJson2 = DeserializeObject({
-            test: 'test',
-            test2: 'test2',
-        }, TestClass2);
+            const testJson = DeserializeObject({
+                t: 'test',
+                test2: 'test2',
+                test3: ['test3'],
+                test4: 2,
+            }, TestClass, {
+                mapClassProperties: true,
+            });
 
-        expect(testJson2).toEqual({
-            test: 'test',
+            expect(testJson).toEqual({
+                test: 'test',
+                test2: 'test2',
+                test3: ['test3'],
+                test4: 2,
+            });
         });
     });
 });
 
 describe('SerializeOptions Tests', () => {
-    it('should pass unknown properties if passUnknownProperties is true', () => {
-        class TestClass {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
+    describe('passUnknownProperties Tests', () => {
+        it('should pass unknown properties if passUnknownProperties is true', () => {
+            class TestClass {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
 
-        const testJson = new TestClass();
-        testJson.test = 'test';
-        (testJson as any).test2 = 'test2';
+            const testJson = new TestClass();
+            testJson.test = 'test';
+            (testJson as any).test2 = 'test2';
 
-        expect(JSON.stringify(SerializeObject(testJson, {
-            passUnknownProperties: true,
-        }))).toBe('{"t":"test","test2":"test2"}');
-    });
+            expect(JSON.stringify(SerializeObject(testJson, {
+                passUnknownProperties: true,
+            }))).toBe('{"t":"test","test2":"test2"}');
+        });
 
-    it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
-        class Child {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
+        it('should pass unknown properties of all child classes if passUnknownProperties is true', () => {
+            class Child {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
 
-        class Parent {
-            @JsonProperty('c', Child)
-            public child: Child;
-        }
+            class Parent {
+                @JsonProperty('c', Child)
+                public child: Child;
+            }
 
-        const testJson = new Parent();
-        testJson.child = new Child();
-        testJson.child.test = 'test';
-        (testJson.child as any).test2 = 'test2';
+            const testJson = new Parent();
+            testJson.child = new Child();
+            testJson.child.test = 'test';
+            (testJson.child as any).test2 = 'test2';
 
-        expect(JSON.stringify(SerializeObject(testJson, {
-            passUnknownProperties: true,
-        }))).toBe('{"c":{"t":"test","test2":"test2"}}');
-    });
+            expect(JSON.stringify(SerializeObject(testJson, {
+                passUnknownProperties: true,
+            }))).toBe('{"c":{"t":"test","test2":"test2"}}');
+        });
 
-    it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
-        class TestClass {
-            @JsonProperty('t', JsonType.STRING)
-            public test: string;
-        }
+        it('should not pass unknown properties if passUnknownProperties is false or not passed', () => {
+            class TestClass {
+                @JsonProperty('t', JsonType.STRING)
+                public test: string;
+            }
 
-        const testJson = new TestClass();
-        testJson.test = 'test';
-        (testJson as any).test2 = 'test2';
+            const testJson = new TestClass();
+            testJson.test = 'test';
+            (testJson as any).test2 = 'test2';
 
-        expect(JSON.stringify(SerializeObject(testJson, {
-            passUnknownProperties: false,
-        }))).toBe('{"t":"test"}');
+            expect(JSON.stringify(SerializeObject(testJson, {
+                passUnknownProperties: false,
+            }))).toBe('{"t":"test"}');
 
-        const testJson2 = new TestClass();
-        testJson2.test = 'test';
-        (testJson2 as any).test2 = 'test2';
+            const testJson2 = new TestClass();
+            testJson2.test = 'test';
+            (testJson2 as any).test2 = 'test2';
 
-        expect(JSON.stringify(SerializeObject(testJson2))).toBe('{"t":"test"}');
+            expect(JSON.stringify(SerializeObject(testJson2))).toBe('{"t":"test"}');
+        });
     });
 });

@@ -4,13 +4,11 @@
 import {
     DeserializeObject,
     JsonMixin,
+    JsonOptions,
     JsonProperty,
     JsonType,
     PropertyNullability,
 } from '../src';
-import {
-    JsonOptions,
-} from '../src/decorators';
 
 /**
  * Tests for the JsonMixin decorator.

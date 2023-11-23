@@ -1,13 +1,16 @@
 import {
     GetOrCreateClassMetaData,
+    isBuiltInType,
     MetadataKey,
 } from './helpers';
 import {
+    type BuiltInConstructorType,
     type Constructor,
     type DeserializeType,
     type IJsonClassMetadata,
     type IJsonClassOptions,
     type IJsonPropertyMetadata,
+    type JsonType,
     type PropertyNullability,
 } from './types';
 
@@ -32,8 +35,18 @@ import {
 export const JsonProperty = (jsonProperty: string, type?: DeserializeType, nullabilityMode?: PropertyNullability) => {
     return function (target: any, propertyKey: string) {
         const isArray = Array.isArray(type);
-        const isClass = isArray ? typeof type[0] === 'function' : typeof type === 'function';
-        const classType = (isClass ? (isArray ? type[0] : type) : undefined) as new() => any;
+        let isClass = false;
+        let classType: new() => any;
+        let processedType = type;
+
+        if (isBuiltInType(type) || isArray && isBuiltInType(type[0])) {
+            processedType = isArray ?
+                [(type[0] as BuiltInConstructorType).name?.toLowerCase()] as JsonType[] :
+                (type as BuiltInConstructorType).name?.toLowerCase() as JsonType;
+        } else {
+            isClass = isArray ? typeof type[0] === 'function' : typeof type === 'function';
+            classType = (isClass ? (isArray ? type[0] : type) : undefined) as new() => any;
+        }
 
         const metadata: IJsonPropertyMetadata = {
             array: isArray,
@@ -41,7 +54,7 @@ export const JsonProperty = (jsonProperty: string, type?: DeserializeType, nulla
             jsonProperty,
             nested: isClass,
             nullabilityMode,
-            type,
+            type: processedType,
         };
 
         const targetConstructor = target.constructor;
