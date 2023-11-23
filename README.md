@@ -1,5 +1,7 @@
 # UntypedJSON
+
 ##### Typed JSON. The name is a lie.
+
 [![npm](https://img.shields.io/npm/v/@unnoen/untypedjson?logo=npm)](https://www.npmjs.com/package/@unnoen/untypedjson)
 [![workflow](https://github.com/unnoen/untypedjson/actions/workflows/pull-request.yml/badge.svg?event=push&branch=main)](https://github.com/Unnoen/UntypedJSON)
 ---
@@ -17,19 +19,20 @@ Offers both CommonJS and ES Module builds, so you can use it with Node.js, Webpa
 
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Simple Types](#simple-types)
-  - [Arrays](#arrays)
-  - [Nested Classes](#nested-classes)
-  - [Extending Classes](#extending-classes)
-  - [Null & Undefined Values](#null--undefined-values)
-  - [Default Values](#default-values)
-  - [Custom Deserializers & Serializers](#custom-deserializers--serializers)
-  - [Mixins](#mixins)
+    - [Simple Types](#simple-types)
+    - [Arrays](#arrays)
+    - [Nested Classes](#nested-classes)
+    - [Extending Classes](#extending-classes)
+    - [Null & Undefined Values](#null--undefined-values)
+    - [Default Values](#default-values)
+    - [Custom Deserializers & Serializers](#custom-deserializers--serializers)
+    - [Mixins](#mixins)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
 ## Installation
+
 Just use your favourite package manager:
 
 npm
@@ -45,6 +48,7 @@ Yarn
 `yarn add @unnoen/untypedjson`
 
 ## Usage
+
 It's super simple to use.
 Just decorate your class with `@JsonProperty`, the name of the JSON property and the type of the property.
 Or set a default value for it to be inferred automatically!
@@ -65,24 +69,25 @@ Make sure you have these options enabled in your `tsconfig.json`:
 ```
 
 ### Simple Types
-You have to use the provided `JsonType` enum so that the parser knows how to parse the value, or provide a default value.
+
+You can either use the provided `JsonType` enum or the built-in `String`, `Number`, and `Boolean` constructors so that the parser knows how to parse the value.
+
+Or, provide a default value to infer the type automatically!
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
-
+import {DeserializeObject, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
 class Person {
-  // The JSON uses terrible naming conventions, so we map them to our own ones.
-  @JsonProperty('fn', JsonType.STRING)
-  public name: string;
+    @JsonProperty('fn', JsonType.STRING) // You can use the JsonType enum...
+    public name: string;
 
-  @JsonProperty('a', JsonType.NUMBER)
-  public age: number;
+    @JsonProperty('a', Number) // ...or the built-in constructors.
+    public age: number;
 
-  // We can set a default value to infer the type automatically!
-  // In this case, the parser knows it's a string.
-  @JsonProperty('o')
-  public occupation = 'Unemployed';
+    // We can set a default value to infer the type automatically!
+    // In this case, the parser knows it's a string.
+    @JsonProperty('o')
+    public occupation = 'Unemployed';
 }
 
 const jsonString = '{"fn": "John Doe", "a": 42, "o": "Software Engineer"}';
@@ -96,22 +101,25 @@ console.log(person.occupation); // Software Engineer
 ```
 
 You can also import the `JsonType` constants directly if that's more your style.
+
 ```ts
-import { DeserializeObject, JsonProperty, STRING } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, STRING} from "@unnoen/untypedjson";
 
 class Person {
-  @JsonProperty('fn', STRING)
-  public name: string;
+    @JsonProperty('fn', STRING)
+    public name: string;
 }
+
 // ...
 ```
 
 ### Arrays
+
 Just wrap your type in an array.
 The parser will automatically detect it and parse it as an array.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('aka', [JsonType.STRING])
@@ -127,10 +135,11 @@ console.log(person.aliases[0]); // John
 ```
 
 ### Nested Classes
+
 Just use the class as the type.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('fn', JsonType.STRING)
@@ -157,10 +166,11 @@ console.log(company.employees[0].name); // John Doe
 ```
 
 ### Extending Classes
+
 Just extend the class and use the `@JsonProperty` decorator on the properties you want to override.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('fn', JsonType.STRING)
@@ -184,6 +194,7 @@ console.log(employee.salary); // 100000
 ```
 
 ### Null & Undefined Values
+
 If you want to allow null or undefined values, just use the `PropertyNullability` enum.
 
 - `PropertyNullability.MAP`will attempt to map the value to the type of the property. (default)
@@ -191,12 +202,12 @@ If you want to allow null or undefined values, just use the `PropertyNullability
 - `PropertyNullability.PASS` will pass the value as is.
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, JsonType, PropertyNullability} from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('fn', JsonType.STRING)
     public name: string;
-    
+
     @JsonProperty('a', JsonType.NUMBER, PropertyNullability.IGNORE)
     public age: number;
 }
@@ -210,6 +221,7 @@ console.log(person.age); // undefined
 ```
 
 ### Default Values
+
 If you want to set a default value, just set it in the initializer.
 
 Setting a default value means you don't need to specify the type of the property; it will be inferred. (Unless you want to override it!)
@@ -217,15 +229,15 @@ Setting a default value means you don't need to specify the type of the property
 Make sure to set the `PropertyNullability` to `PropertyNullability.IGNORE` so that the parser doesn't override it!
 
 ```ts
-import { DeserializeObject, JsonProperty, JsonType, PropertyNullability } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonProperty, JsonType, PropertyNullability} from "@unnoen/untypedjson";
 
 class Person {
     @JsonProperty('fn', JsonType.STRING)
     public name: string;
-    
+
     @JsonProperty('a', JsonType.NUMBER, PropertyNullability.IGNORE)
     public age: number = 42;
-    
+
     @JsonProperty('o')
     public occupation = 'Unemployed';
 }
@@ -240,19 +252,20 @@ console.log(person.occupation); // Software Engineer
 ```
 
 ### Custom Deserializers & Serializers
+
 If you want to use a custom deserializer or serializer, just extend the `JsonConverter` class and override the `Deserialize` and `Serialize` methods.
 
 Make sure you implement your own type checking!
 
 ```ts
-import { DeserializeObject, JsonConverter, JsonProperty, JsonType } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonConverter, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
 class DateConverter extends JsonConverter<Date> {
-    public Serialize (value: Date): string {
+    public Serialize(value: Date): string {
         return value.toISOString();
     }
 
-    public Deserialize (value: JsonType.STRING): Date {
+    public Deserialize(value: JsonType.STRING): Date {
         return new Date(value);
     }
 }
@@ -274,6 +287,7 @@ console.log(person.birthday.getFullYear()); // 1990
 ```
 
 ### Mixins
+
 Ever wanted to add properties to a class from multiple other classes? Well now you can!
 
 Use `@JsonMixin` to inherit properties from multiple classes. It also inherits the `@JsonProperty` decorators and getters/setters.
@@ -281,9 +295,10 @@ Use `@JsonMixin` to inherit properties from multiple classes. It also inherits t
 Make sure to define the interface for the class you're mixing in!
 
 ```ts
-import { DeserializeObject, JsonMixin, JsonProperty, JsonType } from "@unnoen/untypedjson";
+import {DeserializeObject, JsonMixin, JsonProperty, JsonType} from "@unnoen/untypedjson";
 
-interface EmployeePerson extends Person, Employee {} // You must define the interface otherwise the compiler will complain.
+interface EmployeePerson extends Person, Employee {
+} // You must define the interface otherwise the compiler will complain.
 
 class Person {
     @JsonProperty('fn', JsonType.STRING)
@@ -308,7 +323,42 @@ console.log(employee.name); // John Doe
 console.log(employee.salary); // 100000
 ```
 
+## Configuration
+
+There are multiple ways to pass in options, you can do it on a per-class basis with the `@JsonOptions` decorator, or for the entire deserializer/serializer.
+
+```ts
+import {DeserializeObject, JsonOptions, JsonProperty, JsonType} from "@unnoen/untypedjson";
+
+@JsonOptions({
+    // Options go here...
+    mapClassProperties: true,
+})
+class Person {
+    @JsonProperty('fn', JsonType.STRING)
+    public name: string;
+}
+
+const jsonString = '{"fn": "John Doe"}';
+
+const person = DeserializeObject(jsonString, Person, {
+    // ...or here.
+    passUnknownProperties: true,
+});
+
+console.log(person.name); // John Doe
+```
+
+### Options
+
+| Option                   | Method                                                         | Type                  | Default                   | Description                                                                          |
+|--------------------------|----------------------------------------------------------------|-----------------------|---------------------------|--------------------------------------------------------------------------------------|
+| `defaultNullabilityMode` | `@JsonOptions`                                                 | `PropertyNullability` | `PropertyNullability.MAP` | The default nullability for all properties in the class.                             |
+| `mapClassProperties`     | `@JsonOptions`<br/>`DeserializeOptions`                        | `boolean`             | `false`                   | Whether to automatically map class properties to JSON properties if the names match. |
+| `passUnknownProperties`  | `@JsonOptions`<br/>`DeserializeOptions`<br/>`SerializeOptions` | `boolean`             | `false`                   | Whether to pass unknown properties to the class.                                     |
+
 ## Contributing
+
 No pull request is too small!
 
 If you want to contribute, just fork the repository and create a pull request into the `main` branch.
@@ -318,11 +368,13 @@ This project uses [Yarn Berry](https://yarnpkg.com/getting-started/install) for 
 Linting and tests are run on every commit, but don't worry if it fails! The most important part is contributing, linting issues and tests can be fixed later. :)
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 TL;DR - Do whatever you want with it. Just don't sue me if it breaks.
 I'd appreciate it if you could link back to this repository though. :)
 
 ## Acknowledgements
+
 - [json2typescript](https://www.npmjs.com/package/json2typescript)
-  - UntypedJSON is heavily inspired by this project. I wanted a lightweight alternative and decided to make my own.
+    - UntypedJSON is heavily inspired by this project. I wanted a lightweight alternative and decided to make my own.
