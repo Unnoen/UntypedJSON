@@ -64,6 +64,10 @@ const verifyType = (propertyKey: string, properties: IJsonPropertyMetadata, json
         throw new TypeError(`Property ${propertyKey} does not have a type and cannot be inferred from the default value.`);
     }
 
+    if (type === JsonType.ANY && inferredType === undefined) {
+        return;
+    }
+
     if (inferredType !== undefined && type === undefined) {
         type = inferredType as DeserializeType;
     }
@@ -225,15 +229,36 @@ export const DeserializeObject = <T>(json: object | string, classReference: new(
             mapObjectProperty(propertyKey, classMetadata.properties[propertyKey], jsonObject, instance, false, options);
         }
 
-        if (options?.passUnknownProperties && classConstructor?.prototype !== undefined) {
-            const unknownProperties = Object.keys(jsonObject).filter((key) => {
-                return !Object.values(classMetadata.properties).some((property) => {
-                    return property.jsonProperty === key;
-                });
-            });
+        if (classConstructor?.prototype !== undefined) {
+            if (classMetadata.options?.mapClassProperties || options?.mapClassProperties) {
+                const classProperties = Object.keys(instance);
 
-            for (const unknownProperty of unknownProperties) {
-                instance[unknownProperty] = jsonObject[unknownProperty];
+                for (const classProperty of classProperties) {
+                    if (!propertyKeys.includes(classProperty)) {
+                        const propertyMetadata: IJsonPropertyMetadata = {
+                            array: Array.isArray(instance[classProperty]),
+                            jsonProperty: classProperty,
+                            nested: false,
+                            nullabilityMode: classMetadata.options?.defaultNullabilityMode ?? PropertyNullability.MAP,
+                            type: JsonType.ANY,
+                        };
+
+                        verifyNullability(classProperty, propertyMetadata, jsonObject);
+                        mapObjectProperty(classProperty, propertyMetadata, jsonObject, instance, false, options);
+                    }
+                }
+            }
+
+            if (classMetadata.options?.passUnknownProperties || options?.passUnknownProperties) {
+                const unknownProperties = Object.keys(jsonObject).filter((key) => {
+                    return !Object.values(classMetadata.properties).some((property) => {
+                        return property.jsonProperty === key;
+                    });
+                });
+
+                for (const unknownProperty of unknownProperties) {
+                    instance[unknownProperty] = jsonObject[unknownProperty];
+                }
             }
         }
 

@@ -5,9 +5,12 @@ import {
 
 /**
  * Represents the options for deserializing an object.
+ * @property {boolean} [mapClassProperties=false] - Whether to try and map JSON properties to class names by default.
+ * This means you don't need to use @JsonProperty if the property name is the same as the class name.
  * @property {boolean} [passUnknownProperties=false] - Determines whether unknown properties should be passed or ignored during deserialization from JSON.
  */
 export type DeserializeOptions = {
+    mapClassProperties?: boolean,
     passUnknownProperties?: boolean,
 };
 
@@ -48,8 +51,16 @@ export type IJsonPropertyMetadata = {
     type?: DeserializeType,
 };
 
+/**
+ * Interface for defining options for JSON class.
+ * @property {PropertyNullability} defaultNullabilityMode - The default nullability mode for properties.
+ * @property {boolean} mapClassProperties - Whether to try and map JSON properties to class names by default.
+ * This means you don't need to use @JsonProperty if the property name is the same as the class name.
+ */
 export type IJsonClassOptions = {
     defaultNullabilityMode?: PropertyNullability,
+    mapClassProperties?: boolean,
+    passUnknownProperties?: boolean,
 };
 
 /**

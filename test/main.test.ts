@@ -573,6 +573,36 @@ describe('JsonOptions Tests', () => {
             }, Child);
         }).toThrow('Property t2 is not a string. It is null.');
     });
+
+    it('should map JSON properties to class properties of the same name if mapClassNames is true', () => {
+        @JsonOptions({
+            mapClassProperties: true,
+        })
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+
+            public test2?: string = undefined;
+
+            public test3?: string[] = undefined;
+
+            public test4: number = 1;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'test',
+            test2: 'test2',
+            test3: ['test3'],
+            test4: 2,
+        }, TestClass);
+
+        expect(testJson).toEqual({
+            test: 'test',
+            test2: 'test2',
+            test3: ['test3'],
+            test4: 2,
+        });
+    });
 });
 
 describe('DeserializeOptions Tests', () => {
@@ -592,6 +622,35 @@ describe('DeserializeOptions Tests', () => {
         expect(testJson).toEqual({
             test: 'test',
             test2: 'test2',
+        });
+    });
+
+    it('should map JSON properties to class properties of the same name if mapClassNames is true', () => {
+        class TestClass {
+            @JsonProperty('t', JsonType.STRING)
+            public test: string;
+
+            public test2?: string = undefined;
+
+            public test3?: string[] = undefined;
+
+            public test4: number = 1;
+        }
+
+        const testJson = DeserializeObject({
+            t: 'test',
+            test2: 'test2',
+            test3: ['test3'],
+            test4: 2,
+        }, TestClass, {
+            mapClassProperties: true,
+        });
+
+        expect(testJson).toEqual({
+            test: 'test',
+            test2: 'test2',
+            test3: ['test3'],
+            test4: 2,
         });
     });
 
