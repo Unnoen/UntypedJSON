@@ -57,6 +57,5 @@
   },
   "resolutions": {
     "semver": "^7.5.2"
-  },
-  "stableVersion": "2.0.0"
+  }
 }
