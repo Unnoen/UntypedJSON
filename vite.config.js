@@ -15,6 +15,9 @@ export default defineConfig({
     },
     test: {
         globals: true,
+        coverage: {
+            provider: 'v8'
+        },
     },
     plugins: [dts({
         rollupTypes: true,
